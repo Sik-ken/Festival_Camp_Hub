@@ -2,6 +2,10 @@ import { useEffect, useState } from "react";
 import { api, mediaUrl } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { PageHeader, Tile } from "@/components/ui";
+import InstagramIcon from "@/components/InstagramIcon";
+
+const INSTAGRAM_URL = "https://www.instagram.com/helmpflicht_db";
+const INSTAGRAM_HANDLE = "@helmpflicht_db";
 
 interface GalleryPhoto {
   id: number;
@@ -69,6 +73,19 @@ export default function Home() {
         <Tile to="/wall-of-fame" label="Wall of Fame" icon="⭐" />
         {user?.roles.includes("admin") && <Tile to="/admin" label="Admin" icon="🛠️" />}
       </div>
+
+      <a
+        href={INSTAGRAM_URL}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="mt-4 flex items-center gap-3 rounded-2xl bg-white/5 border border-white/10 p-4 hover:bg-white/10 transition"
+      >
+        <InstagramIcon className="w-8 h-8 text-camp-primary shrink-0" />
+        <div className="min-w-0">
+          <p className="font-semibold">Folgt uns auf Instagram</p>
+          <p className="text-sm text-camp-neutral truncate">{INSTAGRAM_HANDLE}</p>
+        </div>
+      </a>
     </div>
   );
 }
