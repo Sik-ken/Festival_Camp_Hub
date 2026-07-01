@@ -43,20 +43,25 @@ export default function Leaderboards() {
         {tab === "points"
           ? points.map((p) => (
               <Card key={p.rank} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-camp-warm font-bold w-6">{p.rank}</span>
-                  <span className="font-semibold">{p.nickname}</span>
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-camp-warm font-bold w-6 shrink-0">{p.rank}</span>
+                  <span className="font-semibold truncate">
+                    {p.nickname} <span className="text-camp-neutral font-normal">· {p.level_name}</span>
+                  </span>
                 </div>
-                <span className="text-camp-primary font-bold">{p.points} P</span>
+                <span className="text-camp-primary font-bold shrink-0">{p.points} P</span>
               </Card>
             ))
           : funnels.map((f) => (
               <Card key={f.rank} className="flex items-center justify-between">
-                <div className="flex items-center gap-3">
-                  <span className="text-camp-warm font-bold w-6">{f.rank}</span>
-                  <span className="font-semibold">{f.nickname}</span>
+                <div className="flex items-center gap-3 min-w-0">
+                  <span className="text-camp-warm font-bold w-6 shrink-0">{f.rank}</span>
+                  <span className="font-semibold truncate">
+                    {f.nickname}
+                    {f.badge && <span className="text-camp-neutral font-normal"> · {f.badge}</span>}
+                  </span>
                 </div>
-                <span className="text-camp-primary font-bold">{f.funnels} 🍺</span>
+                <span className="text-camp-primary font-bold shrink-0">{f.funnels} 🍺</span>
               </Card>
             ))}
       </div>

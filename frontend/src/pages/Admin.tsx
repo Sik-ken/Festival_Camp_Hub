@@ -188,7 +188,7 @@ function AdminUserRow({ user, onChanged }: { user: AdminUser; onChanged: () => v
           </div>
 
           <div>
-            <p className="text-xs text-camp-neutral mb-1">PIN zurücksetzen</p>
+            <p className="text-xs text-camp-neutral mb-1">PIN zurücksetzen (mind. 4 Zeichen)</p>
             <div className="flex gap-2">
               <input
                 type="text"

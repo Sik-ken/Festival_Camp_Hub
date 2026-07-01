@@ -1,11 +1,11 @@
 from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
-from sqlalchemy import select
+from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.deps import get_current_user
-from app.models import ActivityEvent, Role, User, UserRole
-from app.schemas import LoginRequest, TokenResponse, UserMe
+from app.models import ActivityEvent, Funnel, Role, User, UserRole
+from app.schemas import LoginRequest, ProfileUpdate, TokenResponse, UserMe
 from app.security import create_access_token, hash_pin, verify_pin
 from app.services.images import save_upload
 
@@ -19,6 +19,33 @@ def _user_roles(db: Session, user: User) -> list[str]:
         )
     ).all()
     return [r[0] for r in rows]
+
+
+def _funnels_total(db: Session, user_id: int) -> int:
+    return db.execute(
+        select(func.coalesce(func.sum(Funnel.count), 0)).where(Funnel.user_id == user_id)
+    ).scalar_one()
+
+
+def _build_user_me(db: Session, user: User) -> UserMe:
+    return UserMe(
+        id=user.id,
+        nickname=user.nickname,
+        hometown=user.hometown,
+        first_name=user.first_name,
+        camp_name=user.camp_name,
+        crush=user.crush,
+        favorite_act=user.favorite_act,
+        favorite_color=user.favorite_color,
+        profile_photo_path=user.profile_photo_path,
+        points=user.points,
+        level_name=user.level_name,
+        created_at=user.created_at,
+        festival_id=user.festival_id,
+        roles=_user_roles(db, user),
+        last_login_at=user.last_login_at,
+        funnels_total=_funnels_total(db, user.id),
+    )
 
 
 @router.post("/register", response_model=TokenResponse, status_code=status.HTTP_201_CREATED)
@@ -100,20 +127,38 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
 
 @router.get("/me", response_model=UserMe)
 def me(user: User = Depends(get_current_user), db: Session = Depends(get_db)):
-    return UserMe(
-        id=user.id,
-        nickname=user.nickname,
-        hometown=user.hometown,
-        first_name=user.first_name,
-        camp_name=user.camp_name,
-        crush=user.crush,
-        favorite_act=user.favorite_act,
-        favorite_color=user.favorite_color,
-        profile_photo_path=user.profile_photo_path,
-        points=user.points,
-        level_name=user.level_name,
-        created_at=user.created_at,
-        festival_id=user.festival_id,
-        roles=_user_roles(db, user),
-        last_login_at=user.last_login_at,
-    )
+    return _build_user_me(db, user)
+
+
+@router.patch("/me", response_model=UserMe)
+def update_me(
+    payload: ProfileUpdate,
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    updates = payload.model_dump(exclude_unset=True)
+
+    if "nickname" in updates and updates["nickname"] != user.nickname:
+        existing = db.execute(
+            select(User).where(User.nickname == updates["nickname"], User.id != user.id)
+        ).scalar_one_or_none()
+        if existing:
+            raise HTTPException(status.HTTP_409_CONFLICT, "Spitzname bereits vergeben")
+
+    for field, value in updates.items():
+        setattr(user, field, value)
+
+    db.commit()
+    return _build_user_me(db, user)
+
+
+@router.post("/me/photo", response_model=UserMe)
+async def update_my_photo(
+    profile_photo: UploadFile = File(...),
+    user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    _, processed_path, _ = await save_upload(profile_photo, "profile")
+    user.profile_photo_path = str(processed_path)
+    db.commit()
+    return _build_user_me(db, user)

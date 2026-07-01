@@ -48,3 +48,14 @@ class UserMe(UserPublic):
     festival_id: str
     roles: list[str]
     last_login_at: datetime | None
+    funnels_total: int
+
+
+class ProfileUpdate(BaseModel):
+    nickname: str | None = Field(default=None, min_length=2, max_length=64)
+    hometown: str | None = Field(default=None, min_length=1, max_length=128)
+    first_name: str | None = None
+    camp_name: str | None = None
+    crush: str | None = None
+    favorite_act: str | None = None
+    favorite_color: str | None = None

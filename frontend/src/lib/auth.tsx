@@ -6,10 +6,16 @@ export interface CurrentUser {
   festival_id: string;
   nickname: string;
   hometown: string;
+  first_name: string | null;
+  camp_name: string | null;
+  crush: string | null;
+  favorite_act: string | null;
+  favorite_color: string | null;
   points: number;
   level_name: string;
   roles: string[];
   profile_photo_path: string;
+  funnels_total: number;
 }
 
 interface AuthContextValue {

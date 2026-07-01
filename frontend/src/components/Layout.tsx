@@ -22,8 +22,8 @@ export default function Layout({ children }: { children: ReactNode }) {
           <span className="text-lg font-extrabold tracking-tight text-camp-primary">Helmpflicht Hub</span>
         </Link>
         {user ? (
-          <Link to="/profile" className="text-sm text-camp-secondary font-semibold">
-            {user.nickname} · {user.points} P
+          <Link to="/profile" className="text-sm text-camp-secondary font-semibold whitespace-nowrap">
+            {user.nickname} · {user.points} P · {user.funnels_total} 🍺
           </Link>
         ) : (
           <Link to="/login" className="text-sm text-camp-secondary font-semibold">

@@ -40,7 +40,7 @@ export default function FriendbookDetail() {
 
   return (
     <div className="pt-2 flex flex-col gap-4">
-      <PageHeader title={entry.nickname} />
+      <PageHeader title={entry.first_name ? `${entry.nickname} (${entry.first_name})` : entry.nickname} />
 
       <Card className="flex flex-col items-center gap-2 text-center">
         {entry.profile_photo_path && (

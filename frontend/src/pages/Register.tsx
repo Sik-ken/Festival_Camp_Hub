@@ -55,9 +55,29 @@ export default function Register() {
       <PageHeader title="Registrieren" subtitle="Spitzname, Heimatort und Profilbild sind Pflicht." />
       <Card>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
-          <Field label="Festival-ID" value={form.festival_id} onChange={update("festival_id")} required />
-          <Field label="PIN" type="password" inputMode="numeric" value={form.pin} onChange={update("pin")} required />
-          <Field label="Spitzname" value={form.nickname} onChange={update("nickname")} required />
+          <Field
+            label="Benutzername"
+            hint="Zum Anmelden, für andere nicht sichtbar"
+            value={form.festival_id}
+            onChange={update("festival_id")}
+            required
+          />
+          <Field
+            label="PIN"
+            hint="Mind. 4 Zeichen"
+            type="password"
+            inputMode="numeric"
+            value={form.pin}
+            onChange={update("pin")}
+            required
+          />
+          <Field
+            label="Spitzname (Anzeigename)"
+            hint="So sehen dich andere im Camp"
+            value={form.nickname}
+            onChange={update("nickname")}
+            required
+          />
           <Field label="Heimatort" value={form.hometown} onChange={update("hometown")} required />
 
           <label className="flex flex-col gap-1">
@@ -91,12 +111,14 @@ export default function Register() {
 
 function Field({
   label,
+  hint,
   ...props
-}: { label: string } & InputHTMLAttributes<HTMLInputElement>) {
+}: { label: string; hint?: string } & InputHTMLAttributes<HTMLInputElement>) {
   return (
     <label className="flex flex-col gap-1">
       <span className="text-sm text-camp-neutral">{label}</span>
       <input className="min-h-12 rounded-xl bg-white/10 px-4 text-base" {...props} />
+      {hint && <span className="text-xs text-camp-neutral/70">{hint}</span>}
     </label>
   );
 }

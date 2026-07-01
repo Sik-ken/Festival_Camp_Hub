@@ -29,11 +29,11 @@ export default function Login() {
   return (
     <div className="pt-2">
       <img src="/branding/Helmpflicht-Logo-2026-300px.png" alt="Camp Helmpflicht" className="h-28 w-auto mx-auto mb-4" />
-      <PageHeader title="Anmelden" subtitle="Mit Festival-ID und PIN einloggen." />
+      <PageHeader title="Anmelden" subtitle="Mit Benutzername und PIN einloggen." />
       <Card>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">
           <label className="flex flex-col gap-1">
-            <span className="text-sm text-camp-neutral">Festival-ID</span>
+            <span className="text-sm text-camp-neutral">Benutzername</span>
             <input
               className="min-h-12 rounded-xl bg-white/10 px-4 text-base"
               value={festivalId}

@@ -38,7 +38,10 @@ export default function Friendbook() {
               <div className="w-16 h-16 rounded-full bg-white/10 shrink-0" />
             )}
             <div className="min-w-0">
-              <p className="font-bold text-camp-primary truncate">{entry.nickname}</p>
+              <p className="font-bold text-camp-primary truncate">
+                {entry.nickname}
+                {entry.first_name && <span className="text-camp-neutral font-normal"> ({entry.first_name})</span>}
+              </p>
               <p className="text-sm text-camp-neutral truncate">{entry.hometown}</p>
               {entry.camp_name && <p className="text-xs text-camp-warm truncate">Camp: {entry.camp_name}</p>}
               {entry.favorite_act && <p className="text-xs text-camp-neutral truncate">Fav. Act: {entry.favorite_act}</p>}
