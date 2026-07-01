@@ -1,8 +1,8 @@
 import json
 
 from fastapi import APIRouter, Depends, HTTPException, status
-from pydantic import BaseModel
-from sqlalchemy import func, select
+from pydantic import BaseModel, Field
+from sqlalchemy import select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
@@ -10,14 +10,14 @@ from app.deps import require_admin
 from app.models import (
     AdminAction,
     Challenge,
-    Funnel,
     Photo,
     Role,
     User,
-    UserChallenge,
     UserRole,
 )
+from app.security import hash_pin
 from app.services.backup import run_backup
+from app.services.leveling import level_for_points
 
 router = APIRouter(prefix="/api/admin", tags=["admin"])
 
@@ -35,29 +35,30 @@ def _log_action(db: Session, admin: User, action_type: str, target_type: str, ta
     )
 
 
-@router.get("/stats")
-def stats(admin: User = Depends(require_admin), db: Session = Depends(get_db)):
-    return {
-        "users": db.execute(select(func.count(User.id))).scalar_one(),
-        "photos": db.execute(select(func.count(Photo.id)).where(Photo.deleted == 0)).scalar_one(),
-        "challenges_completed": db.execute(
-            select(func.count(UserChallenge.id)).where(UserChallenge.status == "completed")
-        ).scalar_one(),
-        "funnels_total": db.execute(select(func.coalesce(func.sum(Funnel.count), 0))).scalar_one(),
-    }
+def _user_roles_map(db: Session) -> dict[int, list[str]]:
+    rows = db.execute(
+        select(UserRole.user_id, Role.name).join(Role, Role.id == UserRole.role_id)
+    ).all()
+    roles_by_user: dict[int, list[str]] = {}
+    for user_id, role_name in rows:
+        roles_by_user.setdefault(user_id, []).append(role_name)
+    return roles_by_user
 
 
 @router.get("/users")
 def list_users(admin: User = Depends(require_admin), db: Session = Depends(get_db)):
     users = db.execute(select(User).order_by(User.created_at.desc())).scalars().all()
+    roles_by_user = _user_roles_map(db)
     return [
         {
             "id": u.id,
             "festival_id": u.festival_id,
             "nickname": u.nickname,
+            "hometown": u.hometown,
             "points": u.points,
             "level_name": u.level_name,
             "is_active": bool(u.is_active),
+            "roles": roles_by_user.get(u.id, []),
             "created_at": u.created_at,
         }
         for u in users
@@ -99,6 +100,8 @@ def remove_role(
     admin: User = Depends(require_admin),
     db: Session = Depends(get_db),
 ):
+    if role_name == "user":
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Grundrolle 'user' kann nicht entfernt werden")
     role = db.execute(select(Role).where(Role.name == role_name)).scalar_one_or_none()
     if role is None:
         raise HTTPException(status.HTTP_400_BAD_REQUEST, "Unbekannte Rolle")
@@ -110,6 +113,91 @@ def remove_role(
         _log_action(db, admin, "remove_role", "user", user_id, before={"role": role_name})
         db.commit()
     return {"user_id": user_id, "removed_role": role_name}
+
+
+class UserUpdate(BaseModel):
+    nickname: str | None = None
+    hometown: str | None = None
+    first_name: str | None = None
+    camp_name: str | None = None
+    crush: str | None = None
+    favorite_act: str | None = None
+    favorite_color: str | None = None
+    is_active: bool | None = None
+
+
+@router.patch("/users/{user_id}")
+def update_user(
+    user_id: int,
+    payload: UserUpdate,
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    target = db.get(User, user_id)
+    if target is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Nutzer nicht gefunden")
+
+    updates = payload.model_dump(exclude_unset=True)
+    before = {field: getattr(target, field) for field in updates}
+    for field, value in updates.items():
+        setattr(target, field, int(value) if field == "is_active" else value)
+
+    _log_action(db, admin, "update_user", "user", user_id, before=before, after=updates)
+    db.commit()
+    return {"id": user_id, "updated": True}
+
+
+class PinReset(BaseModel):
+    new_pin: str = Field(min_length=4, max_length=32)
+
+
+@router.post("/users/{user_id}/reset-pin")
+def reset_pin(
+    user_id: int,
+    payload: PinReset,
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    target = db.get(User, user_id)
+    if target is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Nutzer nicht gefunden")
+    target.pin_hash = hash_pin(payload.new_pin)
+    _log_action(db, admin, "reset_pin", "user", user_id)
+    db.commit()
+    return {"id": user_id, "pin_reset": True}
+
+
+class PointsAdjustment(BaseModel):
+    delta: int
+    reason: str | None = None
+
+
+@router.post("/users/{user_id}/adjust-points")
+def adjust_points(
+    user_id: int,
+    payload: PointsAdjustment,
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    target = db.get(User, user_id)
+    if target is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Nutzer nicht gefunden")
+
+    before_points = target.points
+    target.points = max(0, target.points + payload.delta)
+    target.level_name = level_for_points(target.points)
+
+    _log_action(
+        db,
+        admin,
+        "adjust_points",
+        "user",
+        user_id,
+        before={"points": before_points},
+        after={"points": target.points, "delta": payload.delta, "reason": payload.reason},
+    )
+    db.commit()
+    return {"id": user_id, "points": target.points, "level_name": target.level_name}
 
 
 @router.delete("/photos/{photo_id}")

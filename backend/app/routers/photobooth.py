@@ -6,7 +6,8 @@ from sqlalchemy.orm import Session
 
 from app.config import settings
 from app.database import get_db
-from app.models import ActivityEvent, Photo, Setting
+from app.deps import get_current_user_optional
+from app.models import ActivityEvent, Photo, Setting, User
 from app.services.images import apply_camp_frame, save_upload
 
 router = APIRouter(prefix="/api/photobooth", tags=["photobooth"])
@@ -16,6 +17,7 @@ router = APIRouter(prefix="/api/photobooth", tags=["photobooth"])
 async def create_photobooth_photo(
     photo: UploadFile = File(...),
     caption: str | None = Form(None),
+    user: User | None = Depends(get_current_user_optional),
     db: Session = Depends(get_db),
 ):
     if caption and len(caption) > settings.max_photobooth_text_length:
@@ -33,7 +35,7 @@ async def create_photobooth_photo(
     apply_camp_frame(processed_path, thumbnail_path, frame_path)
 
     photo_row = Photo(
-        user_id=None,
+        user_id=user.id if user else None,
         challenge_id=None,
         upload_type="photobooth",
         original_path=str(original_path),

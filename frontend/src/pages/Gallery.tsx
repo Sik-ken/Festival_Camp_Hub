@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, mediaUrl } from "@/lib/api";
-import { PageHeader } from "@/components/ui";
+import { useAuth } from "@/lib/auth";
+import { Button, PageHeader } from "@/components/ui";
 
 interface GalleryPhoto {
   id: number;
@@ -11,12 +12,21 @@ interface GalleryPhoto {
 }
 
 export default function Gallery() {
+  const { user } = useAuth();
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [selected, setSelected] = useState<GalleryPhoto | null>(null);
 
-  useEffect(() => {
+  function loadPhotos() {
     api.get<GalleryPhoto[]>("/gallery?limit=90").then(setPhotos).catch(() => setPhotos([]));
-  }, []);
+  }
+
+  useEffect(loadPhotos, []);
+
+  async function deletePhoto(id: number) {
+    await api.delete(`/admin/photos/${id}`);
+    setSelected(null);
+    loadPhotos();
+  }
 
   return (
     <div className="pt-2">
@@ -43,6 +53,18 @@ export default function Gallery() {
         >
           <img src={mediaUrl(selected.processed_path)} alt="" className="max-w-full max-h-[80vh] rounded-xl" />
           {selected.caption && <p className="text-white mt-3 text-center">{selected.caption}</p>}
+          {user?.roles.includes("admin") && (
+            <Button
+              variant="ghost"
+              className="mt-4 text-red-400 min-h-10 px-4 text-sm"
+              onClick={(e) => {
+                e.stopPropagation();
+                deletePhoto(selected.id);
+              }}
+            >
+              Foto löschen
+            </Button>
+          )}
         </div>
       )}
     </div>

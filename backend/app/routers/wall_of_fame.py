@@ -3,14 +3,22 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import ActivityEvent, Funnel, Photo, User, UserChallenge
+from app.models import ActivityEvent, Funnel, Photo, Role, User, UserChallenge, UserRole
 
 router = APIRouter(prefix="/api/wall-of-fame", tags=["wall-of-fame"])
+
+
+def _non_admin_ids(db: Session):
+    admin_ids = select(UserRole.user_id).join(Role, Role.id == UserRole.role_id).where(
+        Role.name == "admin"
+    )
+    return User.id.notin_(admin_ids)
 
 
 def _top_user_by(db: Session, column, label: str) -> dict | None:
     row = db.execute(
         select(User.nickname, column.label("value"))
+        .where(_non_admin_ids(db))
         .order_by(column.desc())
         .limit(1)
     ).first()
@@ -22,6 +30,7 @@ def _top_user_by(db: Session, column, label: str) -> dict | None:
 @router.get("")
 def wall_of_fame(db: Session = Depends(get_db)):
     entries = []
+    non_admin = _non_admin_ids(db)
 
     entries.append(_top_user_by(db, User.points, "Meiste Punkte"))
     entries.append(_top_user_by(db, User.points, "Höchstes Level"))
@@ -29,7 +38,7 @@ def wall_of_fame(db: Session = Depends(get_db)):
     challenges_row = db.execute(
         select(User.nickname, func.count(UserChallenge.id).label("value"))
         .join(UserChallenge, UserChallenge.user_id == User.id)
-        .where(UserChallenge.status == "completed")
+        .where(UserChallenge.status == "completed", non_admin)
         .group_by(User.id)
         .order_by(func.count(UserChallenge.id).desc())
         .limit(1)
@@ -42,7 +51,7 @@ def wall_of_fame(db: Session = Depends(get_db)):
     photos_row = db.execute(
         select(User.nickname, func.count(Photo.id).label("value"))
         .join(Photo, Photo.user_id == User.id)
-        .where(Photo.deleted == 0)
+        .where(Photo.deleted == 0, non_admin)
         .group_by(User.id)
         .order_by(func.count(Photo.id).desc())
         .limit(1)
@@ -53,6 +62,7 @@ def wall_of_fame(db: Session = Depends(get_db)):
     funnels_row = db.execute(
         select(User.nickname, func.coalesce(func.sum(Funnel.count), 0).label("value"))
         .join(Funnel, Funnel.user_id == User.id)
+        .where(non_admin)
         .group_by(User.id)
         .order_by(func.sum(Funnel.count).desc())
         .limit(1)
@@ -60,7 +70,9 @@ def wall_of_fame(db: Session = Depends(get_db)):
     if funnels_row and funnels_row.value:
         entries.append({"label": "Meiste Trichter", "nickname": funnels_row.nickname, "value": funnels_row.value})
 
-    first_user = db.execute(select(User).order_by(User.created_at).limit(1)).scalar_one_or_none()
+    first_user = db.execute(
+        select(User).where(non_admin).order_by(User.created_at).limit(1)
+    ).scalar_one_or_none()
     if first_user:
         entries.append({"label": "Erster registrierter Benutzer", "nickname": first_user.nickname, "value": None})
 
@@ -75,6 +87,7 @@ def wall_of_fame(db: Session = Depends(get_db)):
     active_row = db.execute(
         select(User.nickname, func.count(ActivityEvent.id).label("value"))
         .join(ActivityEvent, ActivityEvent.user_id == User.id)
+        .where(non_admin)
         .group_by(User.id)
         .order_by(func.count(ActivityEvent.id).desc())
         .limit(1)

@@ -70,6 +70,46 @@ def correct_funnel(
     return {"id": entry.id, "count": entry.count}
 
 
+@router.get("/user/{user_id}")
+def list_user_funnels(
+    user_id: int,
+    watcher: User = Depends(require_funnel_watcher),
+    db: Session = Depends(get_db),
+):
+    entries = db.execute(
+        select(Funnel).where(Funnel.user_id == user_id).order_by(Funnel.created_at.desc())
+    ).scalars().all()
+    return [
+        {
+            "id": e.id,
+            "count": e.count,
+            "note": e.note,
+            "created_at": e.created_at,
+            "corrected_at": e.corrected_at,
+        }
+        for e in entries
+    ]
+
+
+@router.delete("/{funnel_id}")
+def delete_funnel(
+    funnel_id: int,
+    watcher: User = Depends(require_funnel_watcher),
+    db: Session = Depends(get_db),
+):
+    entry = db.get(Funnel, funnel_id)
+    if entry is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Eintrag nicht gefunden")
+    user_id = entry.user_id
+    db.delete(entry)
+    db.commit()
+
+    total = db.execute(
+        select(func.coalesce(func.sum(Funnel.count), 0)).where(Funnel.user_id == user_id)
+    ).scalar_one()
+    return {"user_id": user_id, "total_funnels": total}
+
+
 @router.get("/leaderboard")
 def funnel_leaderboard(db: Session = Depends(get_db)):
     rows = db.execute(

@@ -85,6 +85,8 @@ def login(payload: LoginRequest, db: Session = Depends(get_db)):
     ).scalar_one_or_none()
     if user is None or not verify_pin(payload.pin, user.pin_hash):
         raise HTTPException(status.HTTP_401_UNAUTHORIZED, "Festival-ID oder PIN falsch")
+    if not user.is_active:
+        raise HTTPException(status.HTTP_403_FORBIDDEN, "Account ist deaktiviert")
 
     from datetime import datetime
 

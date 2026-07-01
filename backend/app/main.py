@@ -13,6 +13,7 @@ from app.routers import (
     gallery,
     leaderboards,
     photobooth,
+    stats,
     wall_of_fame,
 )
 from app.seed.seed_data import run_all_seeds
@@ -50,6 +51,7 @@ app.include_router(challenges.router)
 app.include_router(funnels.router)
 app.include_router(leaderboards.router)
 app.include_router(wall_of_fame.router)
+app.include_router(stats.router)
 app.include_router(admin.router)
 
 

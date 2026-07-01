@@ -30,6 +30,21 @@ export default function Funnels() {
     }
   }
 
+  async function removeLastFunnel(targetId: number, nickname: string) {
+    try {
+      const entries = await api.get<{ id: number }[]>(`/funnels/user/${targetId}`);
+      if (entries.length === 0) {
+        setFeedback(`${nickname} hat noch keine Trichter zum Entfernen`);
+        return;
+      }
+      await api.delete(`/funnels/${entries[0].id}`);
+      setFeedback(`Letzter Trichter von ${nickname} entfernt`);
+      setTimeout(() => setFeedback(null), 2500);
+    } catch {
+      setFeedback("Fehler beim Entfernen");
+    }
+  }
+
   if (!canManage) {
     return (
       <div className="pt-2">
@@ -54,9 +69,18 @@ export default function Funnels() {
         {filtered.map((u) => (
           <Card key={u.id} className="flex items-center justify-between">
             <span className="font-semibold">{u.nickname}</span>
-            <Button onClick={() => addFunnel(u.id, u.nickname)} className="min-h-10 px-4">
-              +1 🍺
-            </Button>
+            <div className="flex gap-2">
+              <Button
+                variant="ghost"
+                onClick={() => removeLastFunnel(u.id, u.nickname)}
+                className="min-h-10 px-3"
+              >
+                -1
+              </Button>
+              <Button onClick={() => addFunnel(u.id, u.nickname)} className="min-h-10 px-4">
+                +1 🍺
+              </Button>
+            </div>
           </Card>
         ))}
       </div>

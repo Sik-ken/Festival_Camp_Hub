@@ -30,6 +30,25 @@ def get_current_user(
     return user
 
 
+def get_current_user_optional(
+    credentials: HTTPAuthorizationCredentials | None = Depends(bearer_scheme),
+    db: Session = Depends(get_db),
+) -> User | None:
+    """Wie get_current_user, gibt aber None statt eines Fehlers zurück, wenn
+    kein/ein ungültiges Token mitgeschickt wurde. Für Endpunkte, die sowohl
+    Gästen als auch eingeloggten Nutzern offenstehen (z. B. Fotobox)."""
+    if credentials is None:
+        return None
+    payload = decode_access_token(credentials.credentials)
+    if payload is None:
+        return None
+    user = db.get(User, int(payload["sub"]))
+    if user is None or not user.is_active:
+        return None
+    user.role_names = payload.get("roles", [])
+    return user
+
+
 def require_roles(*allowed_roles: str) -> Callable[[User], User]:
     def checker(user: User = Depends(get_current_user)) -> User:
         if not set(getattr(user, "role_names", [])) & set(allowed_roles):
