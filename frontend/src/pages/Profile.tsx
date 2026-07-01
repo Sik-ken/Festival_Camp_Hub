@@ -1,4 +1,4 @@
-import { useNavigate } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import { mediaUrl } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { Button, Card, PageHeader } from "@/components/ui";
@@ -29,6 +29,24 @@ export default function Profile() {
         {user.roles.length > 0 && (
           <p className="text-xs text-camp-secondary">Rollen: {user.roles.join(", ")}</p>
         )}
+
+        <div className="flex gap-2 flex-wrap justify-center">
+          {(user.roles.includes("admin") || user.roles.includes("funnel_watcher")) && (
+            <Link to="/funnels">
+              <Button variant="secondary" className="min-h-10 px-4 text-sm">
+                Trichter eintragen
+              </Button>
+            </Link>
+          )}
+          {user.roles.includes("admin") && (
+            <Link to="/admin">
+              <Button variant="secondary" className="min-h-10 px-4 text-sm">
+                Admin-Bereich
+              </Button>
+            </Link>
+          )}
+        </div>
+
         <Button variant="ghost" onClick={logout} className="mt-2">
           Abmelden
         </Button>

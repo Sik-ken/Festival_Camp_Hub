@@ -1,5 +1,6 @@
 import { useEffect, useState } from "react";
 import { api, mediaUrl } from "@/lib/api";
+import { useAuth } from "@/lib/auth";
 import { PageHeader, Tile } from "@/components/ui";
 
 interface GalleryPhoto {
@@ -10,6 +11,7 @@ interface GalleryPhoto {
 const SLIDESHOW_INTERVAL_MS = 1500;
 
 export default function Home() {
+  const { user } = useAuth();
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [index, setIndex] = useState(0);
 
@@ -47,6 +49,7 @@ export default function Home() {
         <Tile to="/funnels" label="Trichterliste" icon="🍺" />
         <Tile to="/leaderboards" label="Ranglisten" icon="🏆" />
         <Tile to="/wall-of-fame" label="Wall of Fame" icon="⭐" />
+        {user?.roles.includes("admin") && <Tile to="/admin" label="Admin" icon="🛠️" />}
       </div>
     </div>
   );
