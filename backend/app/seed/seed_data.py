@@ -11,7 +11,7 @@ ROLES = ["guest", "user", "funnel_watcher", "admin"]
 
 DEFAULT_SETTINGS = {
     "camp_name": settings.camp_name,
-    "public_frame_path": "",
+    "public_frame_path": str(settings.default_camp_badge_path),
     "slideshow_interval_ms": str(settings.slideshow_interval_ms),
 }
 

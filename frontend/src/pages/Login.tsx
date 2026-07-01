@@ -28,6 +28,7 @@ export default function Login() {
 
   return (
     <div className="pt-2">
+      <img src="/branding/Helmpflicht-Logo-2026-300px.png" alt="Camp Helmpflicht" className="h-28 w-auto mx-auto mb-4" />
       <PageHeader title="Anmelden" subtitle="Mit Festival-ID und PIN einloggen." />
       <Card>
         <form onSubmit={handleSubmit} className="flex flex-col gap-4">

@@ -58,19 +58,30 @@ async def save_upload(file: UploadFile, subdir: str) -> tuple[Path, Path, Path]:
     )
 
 
-def apply_camp_frame(processed_path: Path, thumbnail_path: Path, frame_path: Path | None) -> None:
-    """Legt den festen Camp-Rahmen über das Fotobox-Bild, falls ein Rahmen-Asset
-    unter settings.public_frame_path hinterlegt ist. Ohne Rahmen-Datei bleibt
-    das Bild unverändert (Rahmen-Design ist noch nicht geliefert)."""
-    if frame_path is None or not frame_path.is_file():
+def apply_camp_frame(processed_path: Path, thumbnail_path: Path, badge_path: Path | None) -> None:
+    """Setzt das Camp-Logo als Badge in die untere rechte Ecke des Fotobox-Bilds,
+    falls unter settings.public_frame_path ein Logo-Asset hinterlegt ist. Nutzt
+    eine feste Kantenlänge relativ zur kürzeren Bildseite, damit das Logo bei
+    jedem Foto-Seitenverhältnis unverzerrt bleibt (kein Stretch auf Bildgröße).
+    Ohne hinterlegtes Asset bleibt das Bild unverändert."""
+    if badge_path is None or not badge_path.is_file():
         return
 
     full_processed = settings.data_dir / processed_path
     full_thumbnail = settings.data_dir / thumbnail_path
 
-    with Image.open(frame_path).convert("RGBA") as frame:
+    with Image.open(badge_path).convert("RGBA") as badge:
         for target in (full_processed, full_thumbnail):
             with Image.open(target).convert("RGBA") as base:
-                resized_frame = frame.resize(base.size)
-                composed = Image.alpha_composite(base, resized_frame).convert("RGB")
-                composed.save(target, "JPEG", quality=85)
+                badge_width = int(min(base.size) * 0.28)
+                ratio = badge_width / badge.width
+                badge_height = int(badge.height * ratio)
+                resized_badge = badge.resize((badge_width, badge_height), Image.LANCZOS)
+
+                margin = int(min(base.size) * 0.03)
+                position = (
+                    base.width - badge_width - margin,
+                    base.height - badge_height - margin,
+                )
+                base.paste(resized_badge, position, resized_badge)
+                base.convert("RGB").save(target, "JPEG", quality=85)

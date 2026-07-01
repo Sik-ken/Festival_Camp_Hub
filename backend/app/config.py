@@ -28,6 +28,8 @@ class Settings(BaseSettings):
     admin_bootstrap_festival_id: str = "admin"
     admin_bootstrap_pin: str = "changeme123"
 
+    default_camp_badge_path: Path = Path(__file__).parent / "assets" / "camp_badge.png"
+
     class Config:
         env_prefix = "HUB_"
 

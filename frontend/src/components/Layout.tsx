@@ -17,8 +17,9 @@ export default function Layout({ children }: { children: ReactNode }) {
   return (
     <div className="min-h-screen flex flex-col bg-camp-bg text-white">
       <header className="px-4 pt-4 pb-2 flex items-center justify-between">
-        <Link to="/" className="text-lg font-extrabold tracking-tight text-camp-primary">
-          🪖 Helmpflicht Hub
+        <Link to="/" className="flex items-center gap-2">
+          <img src="/branding/Helmpflicht-Logo-2026-300px.png" alt="Camp Helmpflicht" className="h-10 w-auto" />
+          <span className="text-lg font-extrabold tracking-tight text-camp-primary">Helmpflicht Hub</span>
         </Link>
         {user ? (
           <Link to="/profile" className="text-sm text-camp-secondary font-semibold">

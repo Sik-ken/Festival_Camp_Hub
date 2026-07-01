@@ -8,7 +8,7 @@ export default defineConfig({
     react(),
     VitePWA({
       registerType: "autoUpdate",
-      includeAssets: ["favicon.svg"],
+      includeAssets: ["favicon.png", "branding/*.png"],
       manifest: {
         name: "Helmpflicht Hub",
         short_name: "Helmpflicht",
