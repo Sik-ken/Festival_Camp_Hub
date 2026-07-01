@@ -1,0 +1,90 @@
+from datetime import datetime
+
+from fastapi import APIRouter, Depends, HTTPException, status
+from pydantic import BaseModel
+from sqlalchemy import func, select
+from sqlalchemy.orm import Session
+
+from app.database import get_db
+from app.deps import require_funnel_watcher
+from app.models import ActivityEvent, Funnel, User
+from app.services.leveling import FUNNEL_BADGE_THRESHOLDS
+
+router = APIRouter(prefix="/api/funnels", tags=["funnels"])
+
+
+class FunnelCreate(BaseModel):
+    user_id: int
+    note: str | None = None
+
+
+class FunnelCorrect(BaseModel):
+    count: int
+
+
+@router.post("", status_code=status.HTTP_201_CREATED)
+def add_funnel(
+    payload: FunnelCreate,
+    watcher: User = Depends(require_funnel_watcher),
+    db: Session = Depends(get_db),
+):
+    target = db.get(User, payload.user_id)
+    if target is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Nutzer nicht gefunden")
+
+    entry = Funnel(
+        user_id=target.id,
+        count=1,
+        note=payload.note,
+        created_by_user_id=watcher.id,
+    )
+    db.add(entry)
+    db.add(
+        ActivityEvent(
+            event_type="funnel_added",
+            user_id=target.id,
+            message=f"{target.nickname} hat einen Trichter getrunken",
+        )
+    )
+    db.commit()
+
+    total = db.execute(
+        select(func.coalesce(func.sum(Funnel.count), 0)).where(Funnel.user_id == target.id)
+    ).scalar_one()
+    return {"user_id": target.id, "total_funnels": total}
+
+
+@router.patch("/{funnel_id}")
+def correct_funnel(
+    funnel_id: int,
+    payload: FunnelCorrect,
+    watcher: User = Depends(require_funnel_watcher),
+    db: Session = Depends(get_db),
+):
+    entry = db.get(Funnel, funnel_id)
+    if entry is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Eintrag nicht gefunden")
+    entry.count = payload.count
+    entry.corrected_at = datetime.utcnow()
+    db.commit()
+    return {"id": entry.id, "count": entry.count}
+
+
+@router.get("/leaderboard")
+def funnel_leaderboard(db: Session = Depends(get_db)):
+    rows = db.execute(
+        select(User.id, User.nickname, func.coalesce(func.sum(Funnel.count), 0).label("total"))
+        .join(Funnel, Funnel.user_id == User.id)
+        .group_by(User.id)
+        .order_by(func.sum(Funnel.count).desc(), User.nickname)
+    ).all()
+    result = []
+    for rank, (user_id, nickname, total) in enumerate(rows, start=1):
+        badge = None
+        for threshold, name in FUNNEL_BADGE_THRESHOLDS:
+            if total >= threshold:
+                badge = name
+        result.append(
+            {"rank": rank, "user_id": user_id, "nickname": nickname, "funnels": total, "badge": badge}
+        )
+    return result

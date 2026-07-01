@@ -1,0 +1,31 @@
+services:
+  backend:
+    build: ./backend
+    restart: unless-stopped
+    environment:
+      HUB_DATA_DIR: /data
+      HUB_DB_PATH: /data/db/app.db
+      HUB_UPLOADS_DIR: /data/uploads
+      HUB_THUMBNAILS_DIR: /data/thumbnails
+      HUB_EXPORTS_DIR: /data/exports
+      HUB_BACKUPS_DIR: /backups
+      # Vor dem Festival unbedingt per .env überschreiben:
+      HUB_JWT_SECRET: ${HUB_JWT_SECRET:-change-me-before-festival}
+      HUB_ADMIN_BOOTSTRAP_PIN: ${HUB_ADMIN_BOOTSTRAP_PIN:-changeme123}
+    volumes:
+      - ./data:/data
+      - ./backups:/backups
+    expose:
+      - "8000"
+
+  web:
+    build: ./frontend
+    restart: unless-stopped
+    depends_on:
+      - backend
+    ports:
+      - "80:80"
+
+# Persistente Daten liegen bewusst als Bind-Mounts unter ./data und ./backups
+# (siehe docs/DEPLOYMENT.md) statt in benannten Docker-Volumes, damit auf dem
+# Rock 4C+ einfach auf die USB-SSD unter /mnt/festival-data verlinkt werden kann.

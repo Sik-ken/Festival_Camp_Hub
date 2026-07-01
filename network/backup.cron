@@ -1,0 +1,4 @@
+# Tägliches Backup um 05:00 Uhr (ruhige Camp-Zeit). Installation:
+#   crontab -e
+# und diese Zeile einfügen (Pfad anpassen falls das Repo woanders liegt):
+0 5 * * * cd /opt/helmpflicht-hub && /usr/bin/docker compose exec -T backend python -m app.cli_backup >> /var/log/helmpflicht-backup.log 2>&1

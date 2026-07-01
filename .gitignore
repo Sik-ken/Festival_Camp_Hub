@@ -1,0 +1,29 @@
+# Umgebung / Secrets
+.env
+
+# Python
+__pycache__/
+*.pyc
+.venv/
+.venv_test/
+
+# Node
+node_modules/
+dist/
+.vite/
+
+# Laufzeitdaten (nicht ins Repo, siehe docs/DEPLOYMENT.md)
+data/db/*.db
+data/uploads/*
+data/thumbnails/*
+data/exports/*
+!data/uploads/.gitkeep
+!data/thumbnails/.gitkeep
+!data/exports/.gitkeep
+!data/db/.gitkeep
+backups/*
+!backups/.gitkeep
+
+# OS
+.DS_Store
+Thumbs.db
