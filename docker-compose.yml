@@ -26,6 +26,18 @@ services:
     ports:
       - "80:80"
 
+  cloudflared:
+    image: cloudflare/cloudflared:latest
+    restart: unless-stopped
+    command: tunnel --no-autoupdate run --token ${CLOUDFLARE_TUNNEL_TOKEN}
+    depends_on:
+      - web
+
 # Persistente Daten liegen bewusst als Bind-Mounts unter ./data und ./backups
 # (siehe docs/DEPLOYMENT.md) statt in benannten Docker-Volumes, damit auf dem
 # Rock 4C+ einfach auf die USB-SSD unter /mnt/festival-data verlinkt werden kann.
+#
+# Zugriff:
+#   - Lokal im WLAN: http://<rock-ip>/ (Port 80, siehe web-Service)
+#   - Von überall: https://helmpflicht.deichdrucker.de/ (Cloudflare Tunnel,
+#     siehe docs/REMOTE_ACCESS.md)

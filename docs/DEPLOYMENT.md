@@ -6,6 +6,8 @@ Die Anwendung läuft lokal auf dem Rock 4C+ und wird über das ESP32-S3-Netzwerk
 
 > **Update (finale Architektur):** ESP32 = `192.168.4.1`, nur WLAN/DHCP. Rock 4C+ = `192.168.4.2`, stellt zusätzlich DNS und Captive Portal bereit. Speicher: USB-SSD unter `/mnt/festival-data/` mit `uploads/`, `thumbnails/`, `exports/`, `backups/`, `database/`.
 
+> **Zusätzlicher Fernzugriff:** Neben dem lokalen Festival-/WLAN-Zugriff ist der Hub auch über eine feste Domain aus dem Internet erreichbar (Cloudflare Tunnel). Details, Setup und Troubleshooting siehe [REMOTE_ACCESS.md](REMOTE_ACCESS.md).
+
 ### 2. Zielumgebung
 - Rock 4C+
 - Linux

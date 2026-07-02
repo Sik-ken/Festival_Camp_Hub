@@ -11,6 +11,7 @@ Lokale Festival-Webanwendung für Camp Helmpflicht auf dem Deichbrand Festival.
 - CHALLENGE_SYSTEM.md
 - BADGES_AND_RANKS.md
 - DEPLOYMENT.md
+- REMOTE_ACCESS.md
 
 ## Zweck
 Diese Dokumente bilden die Grundlage für die Umsetzung in Claude Code oder VS Code.
