@@ -52,7 +52,7 @@ export default function PhotoBooth() {
             ) : (
               <span className="text-4xl">📷</span>
             )}
-            <input type="file" accept="image/*" capture="environment" onChange={handleFile} className="hidden" />
+            <input type="file" accept="image/*" onChange={handleFile} className="hidden" />
           </label>
 
           <label className="flex flex-col gap-1">

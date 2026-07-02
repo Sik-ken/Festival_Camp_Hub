@@ -96,7 +96,6 @@ export default function Profile() {
               <input
                 type="file"
                 accept="image/*"
-                capture="environment"
                 className="hidden"
                 onChange={(e) => setPhoto(e.target.files?.[0] ?? null)}
               />

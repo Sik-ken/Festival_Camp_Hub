@@ -23,13 +23,48 @@ export default function App() {
     <AuthProvider>
       <Layout>
         <Routes>
-          <Route path="/" element={<Home />} />
+          <Route
+            path="/"
+            element={
+              <ProtectedRoute>
+                <Home />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/photo-booth" element={<PhotoBooth />} />
-          <Route path="/friendbook" element={<Friendbook />} />
-          <Route path="/friendbook/:id" element={<FriendbookDetail />} />
-          <Route path="/gallery" element={<Gallery />} />
+          <Route
+            path="/friendbook"
+            element={
+              <ProtectedRoute>
+                <Friendbook />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/friendbook/:id"
+            element={
+              <ProtectedRoute>
+                <FriendbookDetail />
+              </ProtectedRoute>
+            }
+          />
+          <Route
+            path="/gallery"
+            element={
+              <ProtectedRoute>
+                <Gallery />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/leaderboards" element={<Leaderboards />} />
-          <Route path="/wall-of-fame" element={<WallOfFame />} />
+          <Route
+            path="/wall-of-fame"
+            element={
+              <ProtectedRoute>
+                <WallOfFame />
+              </ProtectedRoute>
+            }
+          />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
 
@@ -57,7 +92,14 @@ export default function App() {
               </ProtectedRoute>
             }
           />
-          <Route path="/profile" element={<Profile />} />
+          <Route
+            path="/profile"
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/funnels"
             element={

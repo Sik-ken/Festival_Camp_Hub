@@ -2,7 +2,7 @@ import type { ReactNode } from "react";
 import { Link, useLocation } from "react-router-dom";
 import { useAuth } from "@/lib/auth";
 
-const NAV_ITEMS = [
+const NAV_ITEMS_LOGGED_IN = [
   { to: "/", label: "Home", icon: "🏠" },
   { to: "/photo-booth", label: "Fotobox", icon: "📸" },
   { to: "/tasks", label: "Challenges", icon: "🧱" },
@@ -10,9 +10,16 @@ const NAV_ITEMS = [
   { to: "/profile", label: "Profil", icon: "🪖" },
 ];
 
+const NAV_ITEMS_LOGGED_OUT = [
+  { to: "/photo-booth", label: "Fotobox", icon: "📸" },
+  { to: "/leaderboards", label: "Rangliste", icon: "🏆" },
+  { to: "/login", label: "Anmelden", icon: "🔑" },
+];
+
 export default function Layout({ children }: { children: ReactNode }) {
   const location = useLocation();
   const { user } = useAuth();
+  const navItems = user ? NAV_ITEMS_LOGGED_IN : NAV_ITEMS_LOGGED_OUT;
 
   return (
     <div className="min-h-screen flex flex-col bg-camp-bg text-white">
@@ -35,8 +42,8 @@ export default function Layout({ children }: { children: ReactNode }) {
       <main className="flex-1 px-4 pb-24 max-w-2xl w-full mx-auto">{children}</main>
 
       <nav className="fixed bottom-0 left-0 right-0 bg-camp-bg/95 backdrop-blur border-t border-white/10">
-        <div className="max-w-2xl mx-auto grid grid-cols-5">
-          {NAV_ITEMS.map((item) => {
+        <div className={`max-w-2xl mx-auto grid ${user ? "grid-cols-5" : "grid-cols-3"}`}>
+          {navItems.map((item) => {
             const active = location.pathname === item.to;
             return (
               <Link
