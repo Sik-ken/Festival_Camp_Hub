@@ -3,22 +3,16 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.models import ActivityEvent, Funnel, Photo, Role, User, UserChallenge, UserRole
+from app.models import ActivityEvent, Funnel, Photo, User, UserChallenge
+from app.services.rankings import non_admin_ids
 
 router = APIRouter(prefix="/api/wall-of-fame", tags=["wall-of-fame"])
-
-
-def _non_admin_ids(db: Session):
-    admin_ids = select(UserRole.user_id).join(Role, Role.id == UserRole.role_id).where(
-        Role.name == "admin"
-    )
-    return User.id.notin_(admin_ids)
 
 
 def _top_user_by(db: Session, column, label: str) -> dict | None:
     row = db.execute(
         select(User.nickname, column.label("value"))
-        .where(_non_admin_ids(db))
+        .where(non_admin_ids())
         .order_by(column.desc())
         .limit(1)
     ).first()
@@ -30,7 +24,7 @@ def _top_user_by(db: Session, column, label: str) -> dict | None:
 @router.get("")
 def wall_of_fame(db: Session = Depends(get_db)):
     entries = []
-    non_admin = _non_admin_ids(db)
+    non_admin = non_admin_ids()
 
     entries.append(_top_user_by(db, User.points, "Meiste Punkte"))
     entries.append(_top_user_by(db, User.points, "Höchstes Level"))

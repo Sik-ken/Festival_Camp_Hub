@@ -4,6 +4,7 @@ from sqlalchemy.orm import Session
 
 from app.database import get_db
 from app.models import User
+from app.services.rankings import non_admin_ids
 
 router = APIRouter(prefix="/api/leaderboards", tags=["leaderboards"])
 
@@ -12,7 +13,7 @@ router = APIRouter(prefix="/api/leaderboards", tags=["leaderboards"])
 def points_leaderboard(limit: int = Query(50, le=200), db: Session = Depends(get_db)):
     users = db.execute(
         select(User)
-        .where(User.is_active == 1)
+        .where(User.is_active == 1, non_admin_ids())
         .order_by(User.points.desc(), User.nickname)
         .limit(limit)
     ).scalars().all()

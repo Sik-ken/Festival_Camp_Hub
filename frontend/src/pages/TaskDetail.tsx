@@ -3,6 +3,7 @@ import { useNavigate, useParams } from "react-router-dom";
 import { api } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { Button, Card, PageHeader } from "@/components/ui";
+import PhotoPicker from "@/components/PhotoPicker";
 
 interface ChallengeDetail {
   id: number;
@@ -55,19 +56,7 @@ export default function TaskDetail() {
           <p className="text-camp-primary font-semibold">✅ Bereits erledigt</p>
         ) : (
           <>
-            <label className="flex flex-col items-center justify-center gap-2 min-h-40 rounded-xl bg-white/10 cursor-pointer overflow-hidden">
-              {file ? (
-                <img src={URL.createObjectURL(file)} alt="" className="w-full h-full object-cover" />
-              ) : (
-                <span className="text-4xl">📷</span>
-              )}
-              <input
-                type="file"
-                accept="image/*"
-                onChange={(e) => setFile(e.target.files?.[0] ?? null)}
-                className="hidden"
-              />
-            </label>
+            <PhotoPicker file={file} onChange={setFile} />
             {error && <p className="text-red-400 text-sm">{error}</p>}
             <Button disabled={!file || loading} onClick={handleSubmit}>
               {loading ? "Wird hochgeladen…" : "Challenge abschließen"}

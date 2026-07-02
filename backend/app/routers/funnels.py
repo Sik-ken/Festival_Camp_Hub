@@ -9,6 +9,7 @@ from app.database import get_db
 from app.deps import require_funnel_watcher
 from app.models import ActivityEvent, Funnel, User
 from app.services.leveling import FUNNEL_BADGE_THRESHOLDS
+from app.services.rankings import non_admin_ids
 
 router = APIRouter(prefix="/api/funnels", tags=["funnels"])
 
@@ -115,6 +116,7 @@ def funnel_leaderboard(db: Session = Depends(get_db)):
     rows = db.execute(
         select(User.id, User.nickname, func.coalesce(func.sum(Funnel.count), 0).label("total"))
         .join(Funnel, Funnel.user_id == User.id)
+        .where(non_admin_ids())
         .group_by(User.id)
         .order_by(func.sum(Funnel.count).desc(), User.nickname)
     ).all()
