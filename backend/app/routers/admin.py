@@ -8,11 +8,16 @@ from sqlalchemy.orm import Session
 from app.database import get_db
 from app.deps import require_admin
 from app.models import (
+    ActivityEvent,
     AdminAction,
     Challenge,
+    Funnel,
     Photo,
+    PushSubscription,
     Role,
     User,
+    UserBadge,
+    UserChallenge,
     UserRole,
 )
 from app.security import hash_pin
@@ -145,6 +150,45 @@ def update_user(
     _log_action(db, admin, "update_user", "user", user_id, before=before, after=updates)
     db.commit()
     return {"id": user_id, "updated": True}
+
+
+@router.delete("/users/{user_id}")
+def delete_user(
+    user_id: int,
+    admin: User = Depends(require_admin),
+    db: Session = Depends(get_db),
+):
+    target = db.get(User, user_id)
+    if target is None:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Nutzer nicht gefunden")
+    if target.is_active:
+        raise HTTPException(
+            status.HTTP_400_BAD_REQUEST,
+            "Nutzer muss zuerst deaktiviert werden, bevor er gelöscht werden kann",
+        )
+
+    before = {"festival_id": target.festival_id, "nickname": target.nickname}
+
+    # Fotos, Aktivitäts-Feed und fremde Trichter-Einträge bleiben erhalten
+    # (öffentliche Galerie/Wall of Fame), werden aber vom gelöschten Nutzer gelöst.
+    db.query(Photo).filter(Photo.user_id == user_id).update({"user_id": None})
+    db.query(ActivityEvent).filter(ActivityEvent.user_id == user_id).update({"user_id": None})
+    db.query(Funnel).filter(Funnel.created_by_user_id == user_id).update(
+        {"created_by_user_id": None}
+    )
+
+    # Eigene Datensätze des Nutzers werden vollständig entfernt.
+    db.query(PushSubscription).filter(PushSubscription.user_id == user_id).delete()
+    db.query(UserRole).filter(UserRole.user_id == user_id).delete()
+    db.query(UserBadge).filter(UserBadge.user_id == user_id).delete()
+    db.query(UserChallenge).filter(UserChallenge.user_id == user_id).delete()
+    db.query(Funnel).filter(Funnel.user_id == user_id).delete()
+    db.query(AdminAction).filter(AdminAction.admin_user_id == user_id).delete()
+
+    _log_action(db, admin, "delete_user", "user", user_id, before=before)
+    db.delete(target)
+    db.commit()
+    return {"id": user_id, "deleted": True}
 
 
 class PinReset(BaseModel):

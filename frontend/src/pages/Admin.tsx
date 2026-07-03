@@ -98,6 +98,7 @@ function AdminUserRow({ user, onChanged }: { user: AdminUser; onChanged: () => v
   const [pointsDelta, setPointsDelta] = useState("");
   const [newPin, setNewPin] = useState("");
   const [message, setMessage] = useState<string | null>(null);
+  const [confirmingDelete, setConfirmingDelete] = useState(false);
 
   async function toggleRole(roleName: string) {
     if (user.roles.includes(roleName)) {
@@ -110,6 +111,11 @@ function AdminUserRow({ user, onChanged }: { user: AdminUser; onChanged: () => v
 
   async function toggleActive() {
     await api.patch(`/admin/users/${user.id}`, { is_active: !user.is_active });
+    onChanged();
+  }
+
+  async function deleteUser() {
+    await api.delete(`/admin/users/${user.id}`);
     onChanged();
   }
 
@@ -207,8 +213,43 @@ function AdminUserRow({ user, onChanged }: { user: AdminUser; onChanged: () => v
           {message && <p className="text-xs text-camp-primary">{message}</p>}
 
           <Button variant="ghost" className="min-h-9 text-xs text-red-400" onClick={toggleActive}>
-            {user.is_active ? "Nutzer deaktivieren (löschen)" : "Nutzer reaktivieren"}
+            {user.is_active ? "Nutzer deaktivieren" : "Nutzer reaktivieren"}
           </Button>
+
+          {!user.is_active && (
+            confirmingDelete ? (
+              <div className="flex flex-col gap-2 bg-red-950/40 rounded-lg p-2">
+                <p className="text-xs text-red-300">
+                  Endgültig löschen? Das kann nicht rückgängig gemacht werden. Öffentliche Fotos
+                  bleiben erhalten, werden aber von {user.nickname} gelöst.
+                </p>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    className="min-h-9 px-3 text-xs text-red-400 flex-1"
+                    onClick={deleteUser}
+                  >
+                    Ja, endgültig löschen
+                  </Button>
+                  <Button
+                    variant="ghost"
+                    className="min-h-9 px-3 text-xs flex-1"
+                    onClick={() => setConfirmingDelete(false)}
+                  >
+                    Abbrechen
+                  </Button>
+                </div>
+              </div>
+            ) : (
+              <Button
+                variant="ghost"
+                className="min-h-9 text-xs text-red-400"
+                onClick={() => setConfirmingDelete(true)}
+              >
+                Nutzer endgültig löschen
+              </Button>
+            )
+          )}
         </div>
       )}
     </div>
