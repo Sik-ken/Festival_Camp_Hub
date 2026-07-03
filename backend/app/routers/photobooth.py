@@ -1,6 +1,6 @@
 from pathlib import Path
 
-from fastapi import APIRouter, Depends, File, Form, HTTPException, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, Depends, File, Form, HTTPException, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -9,12 +9,14 @@ from app.database import get_db
 from app.deps import get_current_user_optional
 from app.models import ActivityEvent, Photo, Setting, User
 from app.services.images import apply_camp_frame, save_upload
+from app.services.push import broadcast_push
 
 router = APIRouter(prefix="/api/photobooth", tags=["photobooth"])
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
 async def create_photobooth_photo(
+    background_tasks: BackgroundTasks,
     photo: UploadFile = File(...),
     caption: str | None = Form(None),
     user: User | None = Depends(get_current_user_optional),
@@ -53,6 +55,14 @@ async def create_photobooth_photo(
     )
     db.commit()
     db.refresh(photo_row)
+
+    background_tasks.add_task(
+        broadcast_push,
+        title="Neues Foto! 📸",
+        body=caption or "Ein neues Foto wurde in der Fotobox hochgeladen",
+        url="/gallery",
+        exclude_user_id=user.id if user else None,
+    )
 
     return {
         "id": photo_row.id,

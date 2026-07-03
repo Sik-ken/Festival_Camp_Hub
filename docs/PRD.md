@@ -150,7 +150,6 @@ Darf alles:
 - Keine Kommentare
 - Keine Likes
 - Kein Social Graph / Freundesliste
-- Keine Push-Nachrichten
 - Keine externe Cloud als Betriebsnotwendigkeit
 - Keine KI-Bildanalyse
 - Keine Mehrfachbilder pro Challenge

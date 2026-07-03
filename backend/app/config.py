@@ -28,6 +28,10 @@ class Settings(BaseSettings):
     admin_bootstrap_festival_id: str = "admin"
     admin_bootstrap_pin: str = "changeme123"
 
+    vapid_public_key: str = ""
+    vapid_private_key: str = ""
+    vapid_admin_email: str = "admin@example.com"
+
     default_camp_badge_path: Path = Path(__file__).parent / "assets" / "camp_badge.png"
 
     class Config:

@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, File, HTTPException, UploadFile, status
+from fastapi import APIRouter, BackgroundTasks, Depends, File, HTTPException, UploadFile, status
 from sqlalchemy import select
 from sqlalchemy.orm import Session
 
@@ -9,6 +9,7 @@ from app.deps import get_current_user
 from app.models import ActivityEvent, Challenge, Photo, User, UserChallenge
 from app.services.images import save_upload
 from app.services.leveling import level_for_points
+from app.services.push import broadcast_push
 
 router = APIRouter(prefix="/api/challenges", tags=["challenges"])
 
@@ -61,6 +62,7 @@ def get_challenge(
 @router.post("/{challenge_id}/submit", status_code=status.HTTP_201_CREATED)
 async def submit_challenge(
     challenge_id: int,
+    background_tasks: BackgroundTasks,
     photo: UploadFile = File(...),
     user: User = Depends(get_current_user),
     db: Session = Depends(get_db),
@@ -114,6 +116,14 @@ async def submit_challenge(
         )
     )
     db.commit()
+
+    background_tasks.add_task(
+        broadcast_push,
+        title="Challenge abgeschlossen! 🏗️",
+        body=f"{user.nickname} hat '{challenge.title}' erledigt (+{challenge.points} Punkte)",
+        url="/challenges",
+        exclude_user_id=user.id,
+    )
 
     return {
         "status": "completed",

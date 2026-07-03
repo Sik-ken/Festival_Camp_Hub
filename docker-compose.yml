@@ -12,6 +12,9 @@ services:
       # Vor dem Festival unbedingt per .env überschreiben:
       HUB_JWT_SECRET: ${HUB_JWT_SECRET:-change-me-before-festival}
       HUB_ADMIN_BOOTSTRAP_PIN: ${HUB_ADMIN_BOOTSTRAP_PIN:-changeme123}
+      HUB_VAPID_PUBLIC_KEY: ${HUB_VAPID_PUBLIC_KEY:-}
+      HUB_VAPID_PRIVATE_KEY: ${HUB_VAPID_PRIVATE_KEY:-}
+      HUB_VAPID_ADMIN_EMAIL: ${HUB_VAPID_ADMIN_EMAIL:-admin@example.com}
     volumes:
       - ./data:/data
       - ./backups:/backups

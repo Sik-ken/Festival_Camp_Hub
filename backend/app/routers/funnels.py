@@ -1,6 +1,6 @@
 from datetime import datetime
 
-from fastapi import APIRouter, Depends, HTTPException, status
+from fastapi import APIRouter, BackgroundTasks, Depends, HTTPException, status
 from pydantic import BaseModel
 from sqlalchemy import func, select
 from sqlalchemy.orm import Session
@@ -9,6 +9,7 @@ from app.database import get_db
 from app.deps import require_funnel_watcher
 from app.models import ActivityEvent, Funnel, User
 from app.services.leveling import FUNNEL_BADGE_THRESHOLDS
+from app.services.push import broadcast_push
 from app.services.rankings import non_admin_ids
 
 router = APIRouter(prefix="/api/funnels", tags=["funnels"])
@@ -26,6 +27,7 @@ class FunnelCorrect(BaseModel):
 @router.post("", status_code=status.HTTP_201_CREATED)
 def add_funnel(
     payload: FunnelCreate,
+    background_tasks: BackgroundTasks,
     watcher: User = Depends(require_funnel_watcher),
     db: Session = Depends(get_db),
 ):
@@ -48,6 +50,14 @@ def add_funnel(
         )
     )
     db.commit()
+
+    background_tasks.add_task(
+        broadcast_push,
+        title="Trichter! 🍺",
+        body=f"{target.nickname} hat einen Trichter getrunken",
+        url="/funnels",
+        exclude_user_id=target.id,
+    )
 
     total = db.execute(
         select(func.coalesce(func.sum(Funnel.count), 0)).where(Funnel.user_id == target.id)

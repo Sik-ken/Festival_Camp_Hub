@@ -1,8 +1,9 @@
-import { useState, type ChangeEvent, type FormEvent } from "react";
+import { useEffect, useState, type ChangeEvent, type FormEvent } from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { api, mediaUrl } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
 import { Button, Card, PageHeader } from "@/components/ui";
+import { disablePush, enablePush, getPushSubscription, isPushSupported } from "@/lib/push";
 
 const EDITABLE_FIELDS = [
   { key: "nickname", label: "Spitzname (Anzeigename)" },
@@ -25,6 +26,32 @@ export default function Profile() {
   const [photo, setPhoto] = useState<File | null>(null);
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [pushEnabled, setPushEnabled] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushError, setPushError] = useState<string | null>(null);
+
+  useEffect(() => {
+    if (!isPushSupported()) return;
+    getPushSubscription().then((sub) => setPushEnabled(sub !== null));
+  }, []);
+
+  async function togglePush() {
+    setPushBusy(true);
+    setPushError(null);
+    try {
+      if (pushEnabled) {
+        await disablePush();
+        setPushEnabled(false);
+      } else {
+        await enablePush();
+        setPushEnabled(true);
+      }
+    } catch (err) {
+      setPushError(err instanceof Error ? err.message : "Konnte Benachrichtigungen nicht ändern");
+    } finally {
+      setPushBusy(false);
+    }
+  }
 
   if (!user) {
     return (
@@ -162,6 +189,24 @@ export default function Profile() {
             </Link>
           )}
         </div>
+
+        {isPushSupported() && (
+          <div className="flex flex-col items-center gap-1 mt-2">
+            <Button
+              variant="secondary"
+              onClick={togglePush}
+              disabled={pushBusy}
+              className="min-h-10 px-4 text-sm"
+            >
+              {pushBusy
+                ? "Einen Moment…"
+                : pushEnabled
+                  ? "🔔 Benachrichtigungen deaktivieren"
+                  : "🔕 Benachrichtigungen aktivieren"}
+            </Button>
+            {pushError && <p className="text-red-400 text-xs">{pushError}</p>}
+          </div>
+        )}
 
         <Button variant="ghost" onClick={logout} className="mt-2">
           Abmelden

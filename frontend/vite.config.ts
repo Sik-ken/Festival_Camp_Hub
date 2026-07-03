@@ -9,6 +9,9 @@ export default defineConfig({
     VitePWA({
       registerType: "autoUpdate",
       includeAssets: ["favicon.png", "branding/*.png"],
+      strategies: "injectManifest",
+      srcDir: "src",
+      filename: "sw.ts",
       manifest: {
         name: "Helmpflicht Hub",
         short_name: "Helmpflicht",
@@ -22,24 +25,11 @@ export default defineConfig({
           { src: "/icons/icon-512.png", sizes: "512x512", type: "image/png" },
         ],
       },
-      workbox: {
+      injectManifest: {
         // App-Shell + zuletzt geladene Galerie-/Challenge-Daten cachen, damit
         // Kernfunktionen bei kurzzeitigem Netzwerkausfall im Camp nutzbar bleiben.
-        runtimeCaching: [
-          {
-            urlPattern: /\/api\/(gallery|challenges|friendbook|leaderboards)/,
-            handler: "StaleWhileRevalidate",
-            options: { cacheName: "api-cache" },
-          },
-          {
-            urlPattern: /\/(thumbnails|uploads)\//,
-            handler: "CacheFirst",
-            options: {
-              cacheName: "media-cache",
-              expiration: { maxEntries: 500 },
-            },
-          },
-        ],
+        // Die Cache-Regeln selbst stehen in src/sw.ts (injectManifest-Strategie,
+        // damit dort zusätzlich push/notificationclick-Handler laufen können).
       },
     }),
   ],

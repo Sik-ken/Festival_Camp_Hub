@@ -13,6 +13,7 @@ from app.routers import (
     gallery,
     leaderboards,
     photobooth,
+    push,
     stats,
     wall_of_fame,
 )
@@ -53,6 +54,7 @@ app.include_router(leaderboards.router)
 app.include_router(wall_of_fame.router)
 app.include_router(stats.router)
 app.include_router(admin.router)
+app.include_router(push.router)
 
 
 @app.get("/api/health")
