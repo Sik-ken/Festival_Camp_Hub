@@ -121,6 +121,19 @@ def delete_funnel(
     return {"user_id": user_id, "total_funnels": total}
 
 
+@router.get("/totals")
+def funnel_totals(
+    watcher: User = Depends(require_funnel_watcher),
+    db: Session = Depends(get_db),
+):
+    rows = db.execute(
+        select(User.id, func.coalesce(func.sum(Funnel.count), 0))
+        .outerjoin(Funnel, Funnel.user_id == User.id)
+        .group_by(User.id)
+    ).all()
+    return {user_id: total for user_id, total in rows}
+
+
 @router.get("/leaderboard")
 def funnel_leaderboard(db: Session = Depends(get_db)):
     rows = db.execute(

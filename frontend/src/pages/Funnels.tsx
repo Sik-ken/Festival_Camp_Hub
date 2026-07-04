@@ -11,20 +11,27 @@ interface FriendbookUser {
 export default function Funnels() {
   const { user } = useAuth();
   const [users, setUsers] = useState<FriendbookUser[]>([]);
+  const [totals, setTotals] = useState<Record<number, number>>({});
   const [query, setQuery] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
 
+  const canManage = user?.roles.includes("funnel_watcher") || user?.roles.includes("admin");
+
+  function loadTotals() {
+    api.get<Record<number, number>>("/funnels/totals").then(setTotals).catch(() => setTotals({}));
+  }
+
   useEffect(() => {
     api.get<FriendbookUser[]>("/friendbook").then(setUsers).catch(() => setUsers([]));
-  }, []);
-
-  const canManage = user?.roles.includes("funnel_watcher") || user?.roles.includes("admin");
+    if (canManage) loadTotals();
+  }, [canManage]);
 
   async function addFunnel(targetId: number, nickname: string) {
     try {
       await api.post("/funnels", { user_id: targetId });
       setFeedback(`+1 Trichter für ${nickname} eingetragen`);
       setTimeout(() => setFeedback(null), 2500);
+      loadTotals();
     } catch {
       setFeedback("Fehler beim Eintragen");
     }
@@ -40,6 +47,7 @@ export default function Funnels() {
       await api.delete(`/funnels/${entries[0].id}`);
       setFeedback(`Letzter Trichter von ${nickname} entfernt`);
       setTimeout(() => setFeedback(null), 2500);
+      loadTotals();
     } catch {
       setFeedback("Fehler beim Entfernen");
     }
@@ -68,7 +76,10 @@ export default function Funnels() {
       <div className="flex flex-col gap-2">
         {filtered.map((u) => (
           <Card key={u.id} className="flex items-center justify-between">
-            <span className="font-semibold">{u.nickname}</span>
+            <span className="font-semibold">
+              {u.nickname}{" "}
+              <span className="text-camp-primary">({totals[u.id] ?? 0} 🍺)</span>
+            </span>
             <div className="flex gap-2">
               <Button
                 variant="ghost"
