@@ -9,11 +9,13 @@ interface FriendbookUser {
 }
 
 export default function Funnels() {
-  const { user } = useAuth();
+  const { user, refresh } = useAuth();
   const [users, setUsers] = useState<FriendbookUser[]>([]);
   const [totals, setTotals] = useState<Record<number, number>>({});
   const [query, setQuery] = useState("");
   const [feedback, setFeedback] = useState<string | null>(null);
+  const [nominateQuery, setNominateQuery] = useState("");
+  const [nominateFeedback, setNominateFeedback] = useState<string | null>(null);
 
   const canManage = user?.roles.includes("funnel_watcher") || user?.roles.includes("admin");
 
@@ -53,48 +55,81 @@ export default function Funnels() {
     }
   }
 
-  if (!canManage) {
-    return (
-      <div className="pt-2">
-        <PageHeader title="Trichterliste" subtitle="Nur Trichterwarte und Admins dürfen Trichter eintragen." />
-      </div>
-    );
+  async function nominate(targetId: number, nickname: string) {
+    try {
+      await api.post("/funnels/nominate", { nominee_user_id: targetId });
+      setNominateFeedback(`${nickname} wurde angezeigt!`);
+      await refresh();
+    } catch {
+      setNominateFeedback("Fehler beim Anzeigen");
+    }
   }
 
   const filtered = users.filter((u) => u.nickname.toLowerCase().includes(query.toLowerCase()));
+  const nominateCandidates = users.filter(
+    (u) => u.id !== user?.id && u.nickname.toLowerCase().includes(nominateQuery.toLowerCase())
+  );
 
   return (
-    <div className="pt-2">
-      <PageHeader title="Trichter eintragen" subtitle="0,5L Dosenbier-Trichter = +1" />
-      <input
-        className="min-h-12 w-full rounded-xl bg-white/10 px-4 text-base mb-4"
-        placeholder="Person suchen…"
-        value={query}
-        onChange={(e) => setQuery(e.target.value)}
-      />
-      {feedback && <p className="text-camp-primary text-sm mb-3">{feedback}</p>}
-      <div className="flex flex-col gap-2">
-        {filtered.map((u) => (
-          <Card key={u.id} className="flex items-center justify-between">
-            <span className="font-semibold">
-              {u.nickname}{" "}
-              <span className="text-camp-primary">({totals[u.id] ?? 0} 🍺)</span>
-            </span>
-            <div className="flex gap-2">
-              <Button
-                variant="ghost"
-                onClick={() => removeLastFunnel(u.id, u.nickname)}
-                className="min-h-10 px-3"
-              >
-                -1
-              </Button>
-              <Button onClick={() => addFunnel(u.id, u.nickname)} className="min-h-10 px-4">
-                +1 🍺
-              </Button>
-            </div>
-          </Card>
-        ))}
-      </div>
+    <div className="pt-2 flex flex-col gap-4">
+      <PageHeader title="Trichterliste" subtitle="0,5L Dosenbier-Trichter = +1" />
+
+      {user?.pending_nomination && (
+        <Card>
+          <p className="font-semibold mb-2">Wen zeigst du an?</p>
+          <input
+            className="min-h-12 w-full rounded-xl bg-white/10 px-4 text-base mb-3"
+            placeholder="Person suchen…"
+            value={nominateQuery}
+            onChange={(e) => setNominateQuery(e.target.value)}
+          />
+          {nominateFeedback && <p className="text-camp-primary text-sm mb-3">{nominateFeedback}</p>}
+          <div className="flex flex-col gap-2">
+            {nominateCandidates.map((u) => (
+              <div key={u.id} className="flex items-center justify-between bg-white/5 rounded-xl px-3 py-2">
+                <span className="font-semibold">{u.nickname}</span>
+                <Button className="min-h-9 px-4 text-sm" onClick={() => nominate(u.id, u.nickname)}>
+                  Anzeigen
+                </Button>
+              </div>
+            ))}
+          </div>
+        </Card>
+      )}
+
+      {canManage && (
+        <div>
+          <input
+            className="min-h-12 w-full rounded-xl bg-white/10 px-4 text-base mb-4"
+            placeholder="Person suchen…"
+            value={query}
+            onChange={(e) => setQuery(e.target.value)}
+          />
+          {feedback && <p className="text-camp-primary text-sm mb-3">{feedback}</p>}
+          <div className="flex flex-col gap-2">
+            {filtered.map((u) => (
+              <Card key={u.id} className="flex items-center justify-between">
+                <span className="font-semibold">
+                  {u.nickname}{" "}
+                  <span className="text-camp-primary">({totals[u.id] ?? 0} 🍺)</span>
+                </span>
+                <div className="flex gap-2">
+                  <Button
+                    variant="ghost"
+                    onClick={() => removeLastFunnel(u.id, u.nickname)}
+                    className="min-h-10 px-3"
+                  >
+                    -1
+                  </Button>
+                  <Button onClick={() => addFunnel(u.id, u.nickname)} className="min-h-10 px-4">
+                    +1 🍺
+                  </Button>
+                </div>
+              </Card>
+            ))}
+          </div>
+        </div>
+      )}
     </div>
   );
 }

@@ -49,6 +49,7 @@ class UserMe(UserPublic):
     roles: list[str]
     last_login_at: datetime | None
     funnels_total: int
+    pending_nomination: bool
 
 
 class ProfileUpdate(BaseModel):

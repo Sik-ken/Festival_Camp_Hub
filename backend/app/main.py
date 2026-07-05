@@ -1,10 +1,12 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.staticfiles import StaticFiles
+from sqlalchemy import text
 
 from app.config import settings
 from app.database import Base, SessionLocal, engine
 from app.routers import (
+    activity,
     admin,
     auth,
     challenges,
@@ -29,8 +31,27 @@ app.add_middleware(
 )
 
 
+def _ensure_pending_nomination_column() -> None:
+    """Kein Alembic vorhanden; bestehende SQLite-DBs (z.B. auf dem Rock) bekommen
+    neue Spalten nicht automatisch von create_all. Idempotenter Nachzieh-Schritt."""
+    with engine.connect() as conn:
+        table_exists = conn.execute(
+            text("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
+        ).first()
+        if table_exists is None:
+            return
+
+        columns = {row[1] for row in conn.execute(text("PRAGMA table_info(users)"))}
+        if "pending_nomination" not in columns:
+            conn.execute(
+                text("ALTER TABLE users ADD COLUMN pending_nomination INTEGER DEFAULT 0")
+            )
+            conn.commit()
+
+
 @app.on_event("startup")
 def on_startup() -> None:
+    _ensure_pending_nomination_column()
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:
@@ -44,6 +65,7 @@ app.mount(
     "/thumbnails", StaticFiles(directory=str(settings.thumbnails_dir)), name="thumbnails"
 )
 
+app.include_router(activity.router)
 app.include_router(auth.router)
 app.include_router(friendbook.router)
 app.include_router(photobooth.router)

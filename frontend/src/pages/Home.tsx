@@ -1,7 +1,7 @@
 import { useEffect, useState } from "react";
 import { api, mediaUrl } from "@/lib/api";
 import { useAuth } from "@/lib/auth";
-import { PageHeader, Tile } from "@/components/ui";
+import { Card, PageHeader, Tile } from "@/components/ui";
 import InstagramIcon from "@/components/InstagramIcon";
 
 const INSTAGRAM_URL = "https://www.instagram.com/helmpflicht_db";
@@ -19,6 +19,13 @@ interface PublicStats {
   funnels_total: number;
 }
 
+interface ActivityItem {
+  id: number;
+  event_type: string;
+  message: string;
+  created_at: string;
+}
+
 const SLIDESHOW_INTERVAL_MS = 1500;
 
 export default function Home() {
@@ -26,10 +33,12 @@ export default function Home() {
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [index, setIndex] = useState(0);
   const [stats, setStats] = useState<PublicStats | null>(null);
+  const [activity, setActivity] = useState<ActivityItem[]>([]);
 
   useEffect(() => {
     api.get<GalleryPhoto[]>("/gallery/random?count=20").then(setPhotos).catch(() => setPhotos([]));
     api.get<PublicStats>("/stats").then(setStats).catch(() => setStats(null));
+    api.get<ActivityItem[]>("/activity/recent?limit=3").then(setActivity).catch(() => setActivity([]));
   }, []);
 
   useEffect(() => {
@@ -61,6 +70,19 @@ export default function Home() {
           <StatBox label="Challenges" value={stats.challenges_completed} />
           <StatBox label="Trichter" value={stats.funnels_total} />
         </div>
+      )}
+
+      {activity.length > 0 && (
+        <Card className="mb-6">
+          <p className="font-semibold mb-2">Letzte Ereignisse</p>
+          <div className="flex flex-col gap-1.5">
+            {activity.map((a) => (
+              <p key={a.id} className="text-sm text-camp-neutral">
+                {a.message}
+              </p>
+            ))}
+          </div>
+        </Card>
       )}
 
       <div className="grid grid-cols-3 gap-3">

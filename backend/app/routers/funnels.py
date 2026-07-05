@@ -6,7 +6,7 @@ from sqlalchemy import func, select
 from sqlalchemy.orm import Session
 
 from app.database import get_db
-from app.deps import require_funnel_watcher
+from app.deps import get_current_user, require_funnel_watcher
 from app.models import ActivityEvent, Funnel, User
 from app.services.leveling import FUNNEL_BADGE_THRESHOLDS
 from app.services.push import broadcast_push
@@ -22,6 +22,10 @@ class FunnelCreate(BaseModel):
 
 class FunnelCorrect(BaseModel):
     count: int
+
+
+class FunnelNominate(BaseModel):
+    nominee_user_id: int
 
 
 @router.post("", status_code=status.HTTP_201_CREATED)
@@ -42,6 +46,7 @@ def add_funnel(
         created_by_user_id=watcher.id,
     )
     db.add(entry)
+    target.pending_nomination = 1
     db.add(
         ActivityEvent(
             event_type="funnel_added",
@@ -63,6 +68,44 @@ def add_funnel(
         select(func.coalesce(func.sum(Funnel.count), 0)).where(Funnel.user_id == target.id)
     ).scalar_one()
     return {"user_id": target.id, "total_funnels": total}
+
+
+@router.post("/nominate", status_code=status.HTTP_200_OK)
+def nominate_next(
+    payload: FunnelNominate,
+    background_tasks: BackgroundTasks,
+    current_user: User = Depends(get_current_user),
+    db: Session = Depends(get_db),
+):
+    if not current_user.pending_nomination:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Kein Anzeige-Recht verfügbar")
+
+    if payload.nominee_user_id == current_user.id:
+        raise HTTPException(status.HTTP_400_BAD_REQUEST, "Du kannst dich nicht selbst anzeigen")
+
+    nominee = db.get(User, payload.nominee_user_id)
+    if nominee is None or not nominee.is_active:
+        raise HTTPException(status.HTTP_404_NOT_FOUND, "Nutzer nicht gefunden")
+
+    current_user.pending_nomination = 0
+    db.add(
+        ActivityEvent(
+            event_type="funnel_nominated",
+            user_id=nominee.id,
+            target_id=current_user.id,
+            message=f"{current_user.nickname} hat {nominee.nickname} angezeigt!",
+        )
+    )
+    db.commit()
+
+    background_tasks.add_task(
+        broadcast_push,
+        title="Angezeigt! 👉",
+        body=f"{current_user.nickname} hat {nominee.nickname} angezeigt – {nominee.nickname} ist jetzt dran!",
+        url="/funnels",
+        exclude_user_id=current_user.id,
+    )
+    return {"nominee_user_id": nominee.id, "nominee_nickname": nominee.nickname}
 
 
 @router.patch("/{funnel_id}")

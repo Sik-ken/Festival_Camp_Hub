@@ -45,6 +45,7 @@ def _build_user_me(db: Session, user: User) -> UserMe:
         roles=_user_roles(db, user),
         last_login_at=user.last_login_at,
         funnels_total=_funnels_total(db, user.id),
+        pending_nomination=bool(user.pending_nomination),
     )
 
 

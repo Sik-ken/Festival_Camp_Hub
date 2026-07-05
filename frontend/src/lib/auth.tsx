@@ -16,6 +16,7 @@ export interface CurrentUser {
   roles: string[];
   profile_photo_path: string;
   funnels_total: number;
+  pending_nomination: boolean;
 }
 
 interface AuthContextValue {

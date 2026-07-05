@@ -40,6 +40,7 @@ class User(Base):
     updated_at: Mapped[datetime] = mapped_column(DateTime, default=now, onupdate=now)
     last_login_at: Mapped[datetime | None] = mapped_column(DateTime, nullable=True)
     is_active: Mapped[int] = mapped_column(Integer, default=1)
+    pending_nomination: Mapped[int] = mapped_column(Integer, default=0)
 
     user_roles: Mapped[list["UserRole"]] = relationship(back_populates="user")
 
