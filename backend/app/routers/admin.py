@@ -176,6 +176,9 @@ def delete_user(
     db.query(Funnel).filter(Funnel.created_by_user_id == user_id).update(
         {"created_by_user_id": None}
     )
+    db.query(User).filter(User.nominated_by_user_id == user_id).update(
+        {"nominated_by_user_id": None}
+    )
 
     # Eigene Datensätze des Nutzers werden vollständig entfernt.
     db.query(PushSubscription).filter(PushSubscription.user_id == user_id).delete()

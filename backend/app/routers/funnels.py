@@ -47,6 +47,7 @@ def add_funnel(
     )
     db.add(entry)
     target.pending_nomination = 1
+    target.nominated_by_user_id = None
     db.add(
         ActivityEvent(
             event_type="funnel_added",
@@ -88,6 +89,7 @@ def nominate_next(
         raise HTTPException(status.HTTP_404_NOT_FOUND, "Nutzer nicht gefunden")
 
     current_user.pending_nomination = 0
+    nominee.nominated_by_user_id = current_user.id
     db.add(
         ActivityEvent(
             event_type="funnel_nominated",

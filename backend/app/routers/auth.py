@@ -27,6 +27,13 @@ def _funnels_total(db: Session, user_id: int) -> int:
     ).scalar_one()
 
 
+def _nominated_by_nickname(db: Session, user: User) -> str | None:
+    if user.nominated_by_user_id is None:
+        return None
+    nominator = db.get(User, user.nominated_by_user_id)
+    return nominator.nickname if nominator else None
+
+
 def _build_user_me(db: Session, user: User) -> UserMe:
     return UserMe(
         id=user.id,
@@ -46,6 +53,7 @@ def _build_user_me(db: Session, user: User) -> UserMe:
         last_login_at=user.last_login_at,
         funnels_total=_funnels_total(db, user.id),
         pending_nomination=bool(user.pending_nomination),
+        nominated_by_nickname=_nominated_by_nickname(db, user),
     )
 
 

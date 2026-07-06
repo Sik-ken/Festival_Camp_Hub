@@ -31,9 +31,13 @@ app.add_middleware(
 )
 
 
-def _ensure_pending_nomination_column() -> None:
+def _ensure_users_columns() -> None:
     """Kein Alembic vorhanden; bestehende SQLite-DBs (z.B. auf dem Rock) bekommen
     neue Spalten nicht automatisch von create_all. Idempotenter Nachzieh-Schritt."""
+    new_columns = {
+        "pending_nomination": "INTEGER DEFAULT 0",
+        "nominated_by_user_id": "INTEGER",
+    }
     with engine.connect() as conn:
         table_exists = conn.execute(
             text("SELECT name FROM sqlite_master WHERE type='table' AND name='users'")
@@ -41,17 +45,16 @@ def _ensure_pending_nomination_column() -> None:
         if table_exists is None:
             return
 
-        columns = {row[1] for row in conn.execute(text("PRAGMA table_info(users)"))}
-        if "pending_nomination" not in columns:
-            conn.execute(
-                text("ALTER TABLE users ADD COLUMN pending_nomination INTEGER DEFAULT 0")
-            )
-            conn.commit()
+        existing = {row[1] for row in conn.execute(text("PRAGMA table_info(users)"))}
+        for column, ddl_type in new_columns.items():
+            if column not in existing:
+                conn.execute(text(f"ALTER TABLE users ADD COLUMN {column} {ddl_type}"))
+        conn.commit()
 
 
 @app.on_event("startup")
 def on_startup() -> None:
-    _ensure_pending_nomination_column()
+    _ensure_users_columns()
     Base.metadata.create_all(bind=engine)
     db = SessionLocal()
     try:

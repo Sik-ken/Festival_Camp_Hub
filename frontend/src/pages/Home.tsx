@@ -72,6 +72,14 @@ export default function Home() {
         </div>
       )}
 
+      {user?.nominated_by_nickname && (
+        <div className="mb-6 rounded-2xl bg-red-600 border-2 border-red-400 px-4 py-3 text-center shadow-lg">
+          <p className="font-bold text-white text-base leading-snug">
+            ⚠️ {user.nickname} du wurdest angezeigt von {user.nominated_by_nickname}! 🚨
+          </p>
+        </div>
+      )}
+
       {activity.length > 0 && (
         <Card className="mb-6">
           <p className="font-semibold mb-2">Letzte Ereignisse</p>

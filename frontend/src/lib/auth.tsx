@@ -17,6 +17,7 @@ export interface CurrentUser {
   profile_photo_path: string;
   funnels_total: number;
   pending_nomination: boolean;
+  nominated_by_nickname: string | null;
 }
 
 interface AuthContextValue {

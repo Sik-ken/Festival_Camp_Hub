@@ -50,6 +50,7 @@ class UserMe(UserPublic):
     last_login_at: datetime | None
     funnels_total: int
     pending_nomination: bool
+    nominated_by_nickname: str | None
 
 
 class ProfileUpdate(BaseModel):
