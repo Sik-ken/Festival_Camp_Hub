@@ -146,6 +146,20 @@ Mit `Strg+C` stoppen, dann im Hintergrund laufen lassen zum Weiterarbeiten:
 docker compose up -d
 ```
 
+### A10. Health-Check-Cron einrichten
+Läuft unabhängig von Heim- oder Festival-Netz, kann also schon jetzt
+eingerichtet werden. Prüft stündlich ob die API antwortet und alle Container
+laufen, startet den Stack bei Bedarf automatisch neu.
+```
+chmod +x network/healthcheck.sh
+crontab -e
+```
+Inhalt von `network/healthcheck.cron` einfügen (Pfad in der Zeile ggf.
+anpassen) und speichern.
+
+✅ **Test:** `bash network/healthcheck.sh` einmal manuell ausführen, danach
+`cat healthcheck.log` sollte eine Zeile mit `OK` zeigen.
+
 ---
 
 ## Phase B — Umschalten aufs Festival-Netz

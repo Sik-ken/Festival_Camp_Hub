@@ -1,0 +1,5 @@
+# Stündlicher Health-Check (prüft API + Container, startet bei Bedarf neu).
+# Installation:
+#   crontab -e
+# und diese Zeile einfügen (Pfad anpassen falls das Repo woanders liegt):
+0 * * * * /home/radxa/Festival_Camp_Hub/network/healthcheck.sh

@@ -27,3 +27,6 @@ backups/*
 # OS
 .DS_Store
 Thumbs.db
+
+# Health-Check-Log (Laufzeitdaten, siehe network/healthcheck.sh)
+healthcheck.log

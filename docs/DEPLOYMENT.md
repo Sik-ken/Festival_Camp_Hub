@@ -78,6 +78,10 @@ Empfohlen:
 - Speicherplatz beobachten
 - Datenbank-Backup testen
 - Neustart-Fähigkeit verifizieren
+- Stündlicher Health-Check-Cronjob (`network/healthcheck.sh` +
+  `network/healthcheck.cron`): prüft ob die API antwortet und alle
+  Container laufen, startet den Stack bei Bedarf automatisch neu
+  (`docker compose up -d`). Log unter `healthcheck.log` im Repo-Root.
 
 ### 11. Minimaler Produktions-Stack
 Für Version 1 genügt:
