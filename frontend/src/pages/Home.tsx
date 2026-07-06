@@ -29,13 +29,14 @@ interface ActivityItem {
 const SLIDESHOW_INTERVAL_MS = 1500;
 
 export default function Home() {
-  const { user } = useAuth();
+  const { user, refresh } = useAuth();
   const [photos, setPhotos] = useState<GalleryPhoto[]>([]);
   const [index, setIndex] = useState(0);
   const [stats, setStats] = useState<PublicStats | null>(null);
   const [activity, setActivity] = useState<ActivityItem[]>([]);
 
   useEffect(() => {
+    refresh();
     api.get<GalleryPhoto[]>("/gallery/random?count=20").then(setPhotos).catch(() => setPhotos([]));
     api.get<PublicStats>("/stats").then(setStats).catch(() => setStats(null));
     api.get<ActivityItem[]>("/activity/recent?limit=3").then(setActivity).catch(() => setActivity([]));
