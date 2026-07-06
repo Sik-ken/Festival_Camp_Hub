@@ -1,10 +1,17 @@
 /// <reference lib="webworker" />
+import { clientsClaim } from "workbox-core";
 import { precacheAndRoute } from "workbox-precaching";
 import { registerRoute } from "workbox-routing";
 import { CacheFirst, StaleWhileRevalidate } from "workbox-strategies";
 import { ExpirationPlugin } from "workbox-expiration";
 
 declare let self: ServiceWorkerGlobalScope;
+
+// Ohne skipWaiting/clientsClaim bleibt eine neue Version im "waiting"-Zustand,
+// bis alle Tabs/die installierte PWA komplett geschlossen werden - Deploys
+// kommen sonst erst nach einem vollständigen App-Neustart an.
+self.skipWaiting();
+clientsClaim();
 
 precacheAndRoute(self.__WB_MANIFEST);
 

@@ -34,6 +34,7 @@ export default function Funnels() {
       setFeedback(`+1 Trichter für ${nickname} eingetragen`);
       setTimeout(() => setFeedback(null), 2500);
       loadTotals();
+      if (targetId === user?.id) await refresh();
     } catch {
       setFeedback("Fehler beim Eintragen");
     }
