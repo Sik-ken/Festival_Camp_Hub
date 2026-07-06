@@ -1,7 +1,7 @@
 #!/bin/bash
-# Stündlicher Health-Check: prüft ob die API antwortet und ob alle Container
-# laufen, startet den Docker-Compose-Stack bei Bedarf neu. Einrichtung als
-# Cronjob siehe network/healthcheck.cron.
+# Health-Check (alle 5 Minuten): prüft ob die API antwortet und ob alle
+# Container laufen, startet den Docker-Compose-Stack bei Bedarf neu.
+# Einrichtung als Cronjob siehe network/healthcheck.cron.
 set -u
 
 REPO_DIR="$(cd "$(dirname "${BASH_SOURCE[0]}")/.." && pwd)"
