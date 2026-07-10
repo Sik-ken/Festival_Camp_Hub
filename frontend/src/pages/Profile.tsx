@@ -11,7 +11,7 @@ const EDITABLE_FIELDS = [
   { key: "first_name", label: "Vorname" },
   { key: "camp_name", label: "Camp" },
   { key: "crush", label: "Mein Festival Crush" },
-  { key: "favorite_act", label: "Fav. Act 2025" },
+  { key: "favorite_act", label: "Fav. Act 2026" },
   { key: "favorite_color", label: "Lieblingsfarbe" },
 ] as const;
 

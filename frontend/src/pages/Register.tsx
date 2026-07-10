@@ -96,7 +96,7 @@ export default function Register() {
           <Field label="Vorname" value={form.first_name} onChange={update("first_name")} />
           <Field label="Camp" value={form.camp_name} onChange={update("camp_name")} />
           <Field label="Mein Festival Crush" value={form.crush} onChange={update("crush")} />
-          <Field label="Fav. Act 2025" value={form.favorite_act} onChange={update("favorite_act")} />
+          <Field label="Fav. Act 2026" value={form.favorite_act} onChange={update("favorite_act")} />
           <Field label="Lieblingsfarbe" value={form.favorite_color} onChange={update("favorite_color")} />
 
           {error && <p className="text-red-400 text-sm">{error}</p>}
