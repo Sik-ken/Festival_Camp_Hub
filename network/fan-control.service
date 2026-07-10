@@ -1,0 +1,18 @@
+# systemd-Unit: startet die aktive Lüftersteuerung (network/fan_control.sh)
+# beim Boot und hält sie am Laufen. Installation:
+#   sudo cp network/fan-control.service /etc/systemd/system/
+#   sudo systemctl daemon-reload
+#   sudo systemctl enable --now fan-control.service
+
+[Unit]
+Description=Helmpflicht Hub Rock - aktive PWM-Luefterregelung mit Mindestdrehzahl
+After=multi-user.target
+
+[Service]
+Type=simple
+ExecStart=/home/radxa/Festival_Camp_Hub/network/fan_control.sh
+Restart=always
+RestartSec=5
+
+[Install]
+WantedBy=multi-user.target

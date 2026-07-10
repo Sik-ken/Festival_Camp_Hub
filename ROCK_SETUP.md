@@ -160,6 +160,22 @@ anpassen) und speichern.
 ✅ **Test:** `bash network/healthcheck.sh` einmal manuell ausführen, danach
 `cat healthcheck.log` sollte eine Zeile mit `OK` zeigen.
 
+### A11. Aktive Lüftersteuerung mit Mindestdrehzahl einrichten
+Der Kernel-Governor `step_wise` (siehe oben, `thermal_zone0`) schaltet den
+PWM-Lüfter bei niedriger Temperatur komplett ab und eskaliert nur in zwei
+groben Stufen bis 100°C. `network/fan_control.sh` übernimmt die Regelung
+stattdessen selbst: feinere Rampe, nie ganz aus (Mindestdrehzahl ~30%).
+```
+chmod +x network/fan_control.sh
+sudo cp network/fan-control.service /etc/systemd/system/
+sudo systemctl daemon-reload
+sudo systemctl enable --now fan-control.service
+```
+
+✅ **Test:** `systemctl status fan-control.service` sollte `active (running)`
+zeigen, `cat /sys/class/hwmon/hwmon2/pwm1` sollte im Leerlauf ~77 (statt 0)
+sein.
+
 ---
 
 ## Phase B — Umschalten aufs Festival-Netz
