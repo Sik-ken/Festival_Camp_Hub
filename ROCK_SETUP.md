@@ -165,6 +165,20 @@ anpassen) und speichern.
 ✅ **Test:** `bash network/healthcheck.sh` einmal manuell ausführen, danach
 `cat healthcheck.log` sollte eine Zeile mit `OK` zeigen.
 
+### A10b. Stündlichen Neustart einrichten
+Zusätzliche Stabilitätsmaßnahme: der Rock wurde wiederholt unerreichbar,
+ein Neustart hat aber jedes Mal zuverlässig geholfen. Läuft als
+`/etc/cron.d`-Datei direkt als root, keine sudoers-Änderung nötig.
+```
+sudo cp network/hourly-reboot.cron /etc/cron.d/hourly-reboot
+sudo chmod 644 /etc/cron.d/hourly-reboot
+```
+
+✅ **Test:** `sudo systemctl status cron` sollte `active` zeigen. Nach der
+nächsten vollen Stunde (Minute 2) `uptime` prüfen - sollte eine frische
+Boot-Zeit zeigen, danach `docker compose ps` sollte alle Container wieder
+`Up` zeigen.
+
 ### A11. Aktive Lüftersteuerung mit Mindestdrehzahl einrichten
 Der Kernel-Governor `step_wise` (siehe oben, `thermal_zone0`) schaltet den
 PWM-Lüfter bei niedriger Temperatur komplett ab und eskaliert nur in zwei

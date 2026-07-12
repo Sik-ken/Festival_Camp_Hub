@@ -1,0 +1,11 @@
+# Stündlicher Neustart als Stabilitätsmaßnahme (siehe ROCK_SETUP.md).
+# Der Rock wurde wiederholt unerreichbar (WLAN-Instabilität, siehe
+# healthcheck.sh-Kommentar) und ein Neustart hat jedes Mal zuverlässig
+# geholfen. Läuft als /etc/cron.d-Datei direkt als root, keine
+# sudoers-Änderung nötig. Docker startet danach automatisch wieder
+# (restart: unless-stopped + aktivierter Docker-Boot-Service).
+#
+# Installation:
+#   sudo cp network/hourly-reboot.cron /etc/cron.d/hourly-reboot
+#   sudo chmod 644 /etc/cron.d/hourly-reboot
+2 * * * * root /usr/sbin/reboot
