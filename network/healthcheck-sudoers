@@ -1,8 +1,0 @@
-# Erlaubt dem Health-Check-Cronjob (läuft als "radxa"), das Netzwerk ohne
-# Passwortabfrage neu zu starten, falls das Gateway nicht erreichbar ist.
-# Absichtlich auf genau diese zwei Befehle beschränkt.
-# Installation:
-#   sudo cp network/healthcheck-sudoers /etc/sudoers.d/healthcheck-network-reset
-#   sudo chmod 440 /etc/sudoers.d/healthcheck-network-reset
-#   sudo visudo -cf /etc/sudoers.d/healthcheck-network-reset
-radxa ALL=(root) NOPASSWD: /usr/bin/nmcli networking off, /usr/bin/nmcli networking on

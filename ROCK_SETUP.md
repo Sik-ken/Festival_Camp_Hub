@@ -148,24 +148,22 @@ docker compose up -d
 
 ### A10. Health-Check-Cron einrichten
 Läuft unabhängig von Heim- oder Festival-Netz, kann also schon jetzt
-eingerichtet werden. Prüft alle 5 Minuten ob das Netzwerk-Gateway und die
-API erreichbar sind und ob alle Container laufen, repariert bei Bedarf
-automatisch (Netzwerk-Neustart bzw. `docker compose up -d`).
+eingerichtet werden. Prüft alle 5 Minuten ob die API antwortet und alle
+Container laufen, startet den Stack bei Bedarf automatisch neu.
+
+Hinweis: ein automatischer Netzwerk-Reset (`nmcli networking off/on`) bei
+nicht erreichbarem Gateway wurde bewusst wieder entfernt - auf diesem Rock
+(volle KDE-Desktopumgebung) hat der Toggle das gesamte System zum Hängen
+gebracht statt es zu reparieren, siehe Kommentar in `healthcheck.sh`.
 ```
 chmod +x network/healthcheck.sh
-sudo cp network/healthcheck-sudoers /etc/sudoers.d/healthcheck-network-reset
-sudo chmod 440 /etc/sudoers.d/healthcheck-network-reset
-sudo visudo -cf /etc/sudoers.d/healthcheck-network-reset
 crontab -e
 ```
 Inhalt von `network/healthcheck.cron` einfügen (Pfad in der Zeile ggf.
 anpassen) und speichern.
 
 ✅ **Test:** `bash network/healthcheck.sh` einmal manuell ausführen, danach
-`cat healthcheck.log` sollte eine Zeile mit `OK` zeigen. Mit
-`sudo -n nmcli networking off` und `sudo -n nmcli networking on` prüfen,
-dass beides ohne Passwortabfrage funktioniert (sonst greift die
-Netzwerk-Reparatur im Cronjob nicht).
+`cat healthcheck.log` sollte eine Zeile mit `OK` zeigen.
 
 ### A11. Aktive Lüftersteuerung mit Mindestdrehzahl einrichten
 Der Kernel-Governor `step_wise` (siehe oben, `thermal_zone0`) schaltet den
