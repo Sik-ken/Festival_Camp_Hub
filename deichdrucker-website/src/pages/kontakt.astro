@@ -1,0 +1,87 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import SectionHeader from "@components/SectionHeader.astro";
+import Icon from "@components/Icon.astro";
+import { site } from "@data/site";
+---
+<BaseLayout title="Kontakt – Deichdrucker" description="Projekt anfragen oder Lampe bestellen bei Deichdrucker in Emden. Schreib mir deine Idee.">
+  <section class="section">
+    <div class="container contact">
+      <div class="contact__intro">
+        <SectionHeader no="00" label="Kontakt" title="Erzähl mir von deinem Projekt" intro="Skizze, Foto oder fertige Datei – beschreib kurz, worum es geht. Ich melde mich mit einer ehrlichen Einschätzung." />
+
+        <div class="contact__info">
+          <a href={`mailto:${site.email}`} class="contact__row">
+            <span class="contact__ico"><Icon name="mail" size={20} /></span>
+            <span>{site.email}</span>
+          </a>
+          <div class="contact__row">
+            <span class="contact__ico"><Icon name="pin" size={20} /></span>
+            <span class="mono">{site.address.street}, {site.address.zip} {site.address.city}</span>
+          </div>
+          <div class="contact__social">
+            <a href={site.social.whatsapp} class="btn btn--ghost"><Icon name="whatsapp" size={18} /> WhatsApp</a>
+            <a href={site.social.instagram} class="btn btn--ghost"><Icon name="instagram" size={18} /> Instagram</a>
+          </div>
+        </div>
+      </div>
+
+      <!--
+        TODO: Formular-Ziel setzen. Ohne Backend eignet sich ein Dienst wie
+        Formspree/Netlify Forms (DSGVO prüfen). Solange kein Endpoint gesetzt ist,
+        greift der mailto-Fallback über den Absende-Button.
+      -->
+      <form class="form" action={`mailto:${site.email}`} method="post" enctype="text/plain">
+        <span class="card__corner card__corner--tl"></span>
+        <span class="card__corner card__corner--br"></span>
+        <div class="form__row">
+          <label>Name
+            <input type="text" name="name" required placeholder="Dein Name" />
+          </label>
+          <label>E-Mail
+            <input type="email" name="email" required placeholder="dein@email.de" />
+          </label>
+        </div>
+        <label>Betreff
+          <select name="betreff">
+            <option>3D-Druck-Anfrage</option>
+            <option>CAD-Design</option>
+            <option>3D-Scan</option>
+            <option>Lampe bestellen</option>
+            <option>Sonstiges</option>
+          </select>
+        </label>
+        <label>Deine Nachricht
+          <textarea name="nachricht" rows="6" required placeholder="Beschreib dein Projekt: Was, wie groß, bis wann? Datei/Skizze vorhanden?"></textarea>
+        </label>
+        <p class="form__hint mono">// Tipp: Fotos oder Dateien (STL/STEP) können wir nach deiner Nachricht per Mail austauschen.</p>
+        <button type="submit" class="btn btn--primary btn--lg">Anfrage senden <Icon name="arrow" size={18} /></button>
+        <p class="form__privacy">Mit dem Absenden erklärst du dich mit der Verarbeitung deiner Angaben zur Bearbeitung der Anfrage einverstanden. Details in der <a href="/datenschutz">Datenschutzerklärung</a>.</p>
+      </form>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .contact { display: grid; grid-template-columns: 0.9fr 1.1fr; gap: 2.5rem; align-items: start; }
+  .contact__info { display: grid; gap: 0.9rem; margin-top: 1rem; }
+  .contact__row { display: flex; align-items: center; gap: 0.7rem; color: var(--text); }
+  .contact__ico { display: grid; place-items: center; width: 42px; height: 42px; border: 1px solid var(--line); border-radius: 10px; color: var(--accent); flex-shrink: 0; }
+  .contact__social { display: flex; gap: 0.6rem; flex-wrap: wrap; margin-top: 0.6rem; }
+
+  .form { position: relative; background: var(--surface); border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.5rem, 4vw, 2.2rem); display: grid; gap: 1rem; }
+  .form__row { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; }
+  label { display: grid; gap: 0.4rem; font-size: 0.9rem; color: var(--muted); font-weight: 500; }
+  input, select, textarea {
+    font-family: inherit; font-size: 1rem; color: var(--text);
+    background: var(--bg); border: 1px solid var(--line); border-radius: var(--radius-sm);
+    padding: 0.75rem 0.9rem; width: 100%; resize: vertical;
+    transition: border-color 0.15s ease, box-shadow 0.15s ease;
+  }
+  input:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent); box-shadow: 0 0 0 3px rgba(56,189,248,0.15); }
+  .form__hint { color: var(--muted); font-size: 0.82rem; margin: 0; }
+  .form button { justify-self: start; }
+  .form__privacy { font-size: 0.8rem; color: var(--muted); margin: 0; }
+  .form__privacy a { color: var(--accent); }
+  @media (max-width: 780px) { .contact { grid-template-columns: 1fr; } .form__row { grid-template-columns: 1fr; } }
+</style>

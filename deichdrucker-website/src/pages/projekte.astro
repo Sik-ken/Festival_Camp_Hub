@@ -1,0 +1,37 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import SectionHeader from "@components/SectionHeader.astro";
+import Icon from "@components/Icon.astro";
+import { projects } from "@data/projects";
+---
+<BaseLayout title="Projekte – Deichdrucker" description="Ausgewählte 3D-Druck-, CAD- und Scan-Projekte von Deichdrucker aus Emden.">
+  <section class="section">
+    <div class="container">
+      <SectionHeader no="00" label="Projekte" title="Ausgewählte Arbeiten" intro="Ein Einblick in umgesetzte Projekte – von Ersatzteilen über Prototypen bis zu personalisierten Objekten. (Platzhalter – echte Fotos folgen.)" />
+      <div class="grid grid--3">
+        {projects.map((p) => (
+          <article class="card card--proj">
+            <span class="card__corner card__corner--tl"></span>
+            <span class="card__corner card__corner--br"></span>
+            <div class="frame"><span class="mono">// {p.id}.jpg</span></div>
+            <h3>{p.title}</h3>
+            <p>{p.description}</p>
+            <div class="taglist">{p.tags.map((t) => <span class="tag">{t}</span>)}</div>
+          </article>
+        ))}
+      </div>
+
+      <div class="proj-cta">
+        <p>Dein Projekt könnte das nächste sein.</p>
+        <a href="/kontakt" class="btn btn--primary">Projekt anfragen <Icon name="arrow" size={18} /></a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .card--proj .frame { margin-bottom: 1.1rem; }
+  .taglist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.9rem; }
+  .proj-cta { text-align: center; margin-top: 3rem; display: grid; gap: 1rem; justify-items: center; }
+  .proj-cta p { font-size: 1.2rem; color: var(--text); margin: 0; }
+</style>

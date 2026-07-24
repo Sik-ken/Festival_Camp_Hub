@@ -1,0 +1,61 @@
+---
+import { site, nav } from "@data/site";
+import Icon from "./Icon.astro";
+const year = new Date().getFullYear();
+---
+<footer class="ft">
+  <div class="container">
+    <div class="ft__top">
+      <div class="ft__brand">
+        <span class="ft__name">Deich<span style="color:var(--accent)">drucker</span></span>
+        <p class="ft__claim">3D-Druck, CAD-Design & 3D-Scan aus {site.city}. Von der Idee zum fertigen Objekt – präzise gefertigt in {site.region}.</p>
+        <div class="ft__social">
+          <a href={site.social.instagram} aria-label="Instagram" class="ft__soc"><Icon name="instagram" size={20} /></a>
+          <a href={site.social.facebook} aria-label="Facebook" class="ft__soc"><Icon name="facebook" size={20} /></a>
+          <a href={site.social.whatsapp} aria-label="WhatsApp" class="ft__soc"><Icon name="whatsapp" size={20} /></a>
+          <a href={site.social.telegram} aria-label="Telegram" class="ft__soc"><Icon name="telegram" size={20} /></a>
+        </div>
+      </div>
+
+      <div class="ft__col">
+        <h4 class="ft__h">Navigation</h4>
+        {nav.map((item) => <a href={item.href} class="ft__link">{item.label}</a>)}
+      </div>
+
+      <div class="ft__col">
+        <h4 class="ft__h">Kontakt</h4>
+        <p class="ft__link mono">{site.address.street}</p>
+        <p class="ft__link mono">{site.address.zip} {site.address.city}</p>
+        <a href={`mailto:${site.email}`} class="ft__link">{site.email}</a>
+      </div>
+    </div>
+
+    <hr class="rule" />
+
+    <div class="ft__bottom">
+      <span class="mono">© {year} {site.name} · {site.owner}</span>
+      <span class="ft__legal">
+        <a href="/impressum" class="ft__link">Impressum</a>
+        <a href="/datenschutz" class="ft__link">Datenschutz</a>
+      </span>
+    </div>
+  </div>
+</footer>
+
+<style>
+  .ft { border-top: 1px solid var(--line); background: var(--surface); padding-block: 3rem 1.5rem; margin-top: 2rem; }
+  .ft__top { display: grid; grid-template-columns: 1.6fr 1fr 1fr; gap: 2rem; margin-bottom: 2rem; }
+  .ft__name { font-weight: 700; font-size: 1.3rem; }
+  .ft__claim { margin-top: 0.7rem; max-width: 34ch; font-size: 0.95rem; }
+  .ft__social { display: flex; gap: 0.5rem; margin-top: 1rem; }
+  .ft__soc { display: grid; place-items: center; width: 40px; height: 40px; border: 1px solid var(--line); border-radius: 10px; color: var(--muted); transition: color 0.15s, border-color 0.15s; }
+  .ft__soc:hover { color: var(--accent); border-color: var(--accent); }
+  .ft__h { font-size: 0.82rem; text-transform: uppercase; letter-spacing: 0.1em; color: var(--muted); font-family: var(--font-mono); margin-bottom: 0.9rem; }
+  .ft__col { display: flex; flex-direction: column; gap: 0.5rem; }
+  .ft__link { color: var(--muted); font-size: 0.95rem; margin: 0; }
+  .ft__link:hover { color: var(--text); }
+  .ft__bottom { display: flex; justify-content: space-between; align-items: center; gap: 1rem; flex-wrap: wrap; margin-top: 1.2rem; font-size: 0.88rem; color: var(--muted); }
+  .ft__legal { display: flex; gap: 1.2rem; }
+  @media (max-width: 720px) { .ft__top { grid-template-columns: 1fr 1fr; } .ft__brand { grid-column: 1 / -1; } }
+  @media (max-width: 460px) { .ft__top { grid-template-columns: 1fr; } }
+</style>

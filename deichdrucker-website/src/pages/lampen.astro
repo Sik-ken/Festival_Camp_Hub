@@ -1,0 +1,50 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import SectionHeader from "@components/SectionHeader.astro";
+import Icon from "@components/Icon.astro";
+import { products } from "@data/products";
+---
+<BaseLayout title="Lampen aus Emden – Deichdrucker" description="Emden-Lampe und personalisierte Lithophane-Lampen von Deichdrucker – Licht mit lokalem Charakter und persönlicher Note.">
+  <section class="section">
+    <div class="container">
+      <SectionHeader no="00" label="Produkte" title="Lampen aus Emden" intro="Als Lithophane gefertigt: Motive, die erst im Licht sichtbar werden. Lokal, handgemacht und persönlich." />
+
+      <div class="stack">
+        {products.map((p, i) => (
+          <article class="prod" id={p.id}>
+            <div class="frame frame--wide"><span class="mono">// {p.id}.jpg</span></div>
+            <div class="prod__body">
+              <span class="section-no mono">{`0${i + 1}`}</span>
+              <span class="label">{p.subtitle}</span>
+              <h2>{p.title}</h2>
+              <p>{p.description}</p>
+              <div class="prod__opts">
+                {p.options.map((o) => <span class="tag">{o}</span>)}
+              </div>
+              <div class="prod__foot">
+                <span class="prod__price mono">Preis: {p.priceFrom}</span>
+                <a href="/kontakt" class="btn btn--primary">Bestellen / Anfragen <Icon name="arrow" size={16} /></a>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .prod { display: grid; grid-template-columns: 1fr 1fr; gap: 0; border: 1px solid var(--line); border-radius: var(--radius); overflow: hidden; background: var(--surface); margin-bottom: 1.6rem; }
+  .prod:nth-child(even) .frame { order: 2; }
+  .prod .frame { border: 0; border-right: 1px solid var(--line); border-radius: 0; aspect-ratio: auto; min-height: 320px; }
+  .prod__body { padding: clamp(1.5rem, 4vw, 2.6rem); display: flex; flex-direction: column; justify-content: center; }
+  .prod__body .label { display: block; margin: 0.4rem 0 0.2rem; }
+  .prod__opts { display: flex; flex-wrap: wrap; gap: 0.4rem; margin: 0.4rem 0 1.4rem; }
+  .prod__foot { display: flex; align-items: center; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .prod__price { color: var(--muted); }
+  @media (max-width: 760px) {
+    .prod { grid-template-columns: 1fr; }
+    .prod .frame { border-right: 0; border-bottom: 1px solid var(--line); min-height: 220px; }
+    .prod:nth-child(even) .frame { order: 0; }
+  }
+</style>

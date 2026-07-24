@@ -1,0 +1,74 @@
+---
+// Schlanke Inline-SVG-Icons (kein externer Font/Request).
+interface Props {
+  name: "fdm" | "sla" | "cad" | "scan" | "arrow" | "check" | "pin" | "mail" | "instagram" | "facebook" | "whatsapp" | "telegram" | "menu";
+  size?: number;
+}
+const { name, size = 24 } = Astro.props;
+const s = size;
+---
+{name === "fdm" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M4 20h16" /><rect x="7" y="13" width="10" height="7" /><path d="M9 13v-2M12 13v-4M15 13v-2" /><circle cx="12" cy="5" r="1.5" />
+  </svg>
+)}
+{name === "sla" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 3l7 4v10l-7 4-7-4V7z" /><path d="M12 3v18M5 7l7 4 7-4" />
+  </svg>
+)}
+{name === "cad" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M3 3h18v18H3z" /><path d="M3 9h18M9 3v18" /><circle cx="6" cy="6" r="1" />
+  </svg>
+)}
+{name === "scan" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M4 7V4h3M17 4h3v3M20 17v3h-3M7 20H4v-3" /><path d="M4 12h16" />
+  </svg>
+)}
+{name === "arrow" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M5 12h14M13 6l6 6-6 6" />
+  </svg>
+)}
+{name === "check" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M20 6L9 17l-5-5" />
+  </svg>
+)}
+{name === "pin" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M12 21s-7-6-7-11a7 7 0 0114 0c0 5-7 11-7 11z" /><circle cx="12" cy="10" r="2.5" />
+  </svg>
+)}
+{name === "mail" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="3" y="5" width="18" height="14" rx="2" /><path d="M3 7l9 6 9-6" />
+  </svg>
+)}
+{name === "instagram" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <rect x="3" y="3" width="18" height="18" rx="5" /><circle cx="12" cy="12" r="4" /><circle cx="17.5" cy="6.5" r="0.5" fill="currentColor" />
+  </svg>
+)}
+{name === "facebook" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M14 8h2V5h-2a3 3 0 00-3 3v2H9v3h2v6h3v-6h2l1-3h-3V8a1 1 0 011-1z" />
+  </svg>
+)}
+{name === "whatsapp" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M4 20l1.5-4A8 8 0 1112 20a8 8 0 01-4-1l-4 1z" /><path d="M9 10c0 3 2 5 5 5" />
+  </svg>
+)}
+{name === "telegram" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+    <path d="M21 4L3 11l5 2 2 6 3-4 5 4z" />
+  </svg>
+)}
+{name === "menu" && (
+  <svg width={s} height={s} viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.8" stroke-linecap="round" aria-hidden="true">
+    <path d="M4 7h16M4 12h16M4 17h16" />
+  </svg>
+)}

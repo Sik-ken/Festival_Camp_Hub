@@ -1,0 +1,64 @@
+---
+import "../styles/global.css";
+import Header from "@components/Header.astro";
+import Footer from "@components/Footer.astro";
+import { site } from "@data/site";
+
+interface Props {
+  title?: string;
+  description?: string;
+}
+const {
+  title = `${site.name} – 3D-Druck, CAD & 3D-Scan aus ${site.city}`,
+  description = `Deichdrucker: FDM- & Harz-3D-Druck, CAD-Design und 3D-Scan aus ${site.city} in ${site.region}. Von der Idee zum fertigen Objekt – präzise gefertigt.`,
+} = Astro.props;
+const canonical = new URL(Astro.url.pathname, Astro.site ?? "https://www.deichdrucker.de").href;
+---
+<!doctype html>
+<html lang="de">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>{title}</title>
+    <meta name="description" content={description} />
+    <link rel="canonical" href={canonical} />
+    <meta name="theme-color" content="#0A0E14" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+
+    <!-- Open Graph -->
+    <meta property="og:type" content="website" />
+    <meta property="og:site_name" content={site.name} />
+    <meta property="og:title" content={title} />
+    <meta property="og:description" content={description} />
+    <meta property="og:locale" content="de_DE" />
+
+    <!-- Lokales Business (strukturierte Daten für lokales SEO) -->
+    <script type="application/ld+json" set:html={JSON.stringify({
+      "@context": "https://schema.org",
+      "@type": "LocalBusiness",
+      name: site.name,
+      description,
+      address: {
+        "@type": "PostalAddress",
+        streetAddress: site.address.street,
+        postalCode: site.address.zip,
+        addressLocality: site.address.city,
+        addressCountry: "DE",
+      },
+      areaServed: site.region,
+    })} />
+    <!--
+      TODO Fonts: Für den finalen Look "Space Grotesk" (Sans) und "IBM Plex Mono"
+      DSGVO-konform SELBST hosten (z.B. via @fontsource, lokal gebündelt) –
+      KEINE Google-Fonts-CDN-Einbindung. Aktuell greift die System-Font-Fallback-Kette.
+    -->
+  </head>
+  <body>
+    <a href="#main" class="skip-link">Zum Inhalt springen</a>
+    <Header />
+    <main id="main">
+      <slot />
+    </main>
+    <Footer />
+  </body>
+</html>

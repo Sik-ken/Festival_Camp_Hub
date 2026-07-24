@@ -1,0 +1,27 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import SectionHeader from "@components/SectionHeader.astro";
+import { site } from "@data/site";
+---
+<BaseLayout title="Impressum – Deichdrucker" description="Impressum von Deichdrucker, Emden.">
+  <section class="section">
+    <div class="container legal">
+      <SectionHeader no="00" label="Rechtliches" title="Impressum" />
+      <p class="mono">// Platzhalter – bitte mit den echten, rechtlich verbindlichen Angaben füllen (§ 5 DDG/TMG).</p>
+      <h3>Angaben gemäß § 5 DDG</h3>
+      <p>{site.owner}<br />{site.address.street}<br />{site.address.zip} {site.address.city}<br />{site.address.country}</p>
+      <h3>Kontakt</h3>
+      <p>E-Mail: {site.email}<br />Telefon: [TODO]</p>
+      <h3>Umsatzsteuer / Kleinunternehmer</h3>
+      <p>[TODO: USt-IdNr. oder Hinweis nach § 19 UStG]</p>
+      <h3>Verbraucherstreitbeilegung</h3>
+      <p>[TODO: Standard-Hinweis ergänzen]</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal { max-width: 70ch; }
+  .legal h3 { margin-top: 1.8rem; }
+  .legal p { color: var(--muted); }
+</style>

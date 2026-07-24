@@ -1,0 +1,27 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import SectionHeader from "@components/SectionHeader.astro";
+import { site } from "@data/site";
+---
+<BaseLayout title="Datenschutz – Deichdrucker" description="Datenschutzerklärung von Deichdrucker, Emden.">
+  <section class="section">
+    <div class="container legal">
+      <SectionHeader no="00" label="Rechtliches" title="Datenschutzerklärung" />
+      <p class="mono">// Platzhalter – bitte durch eine vollständige, DSGVO-konforme Erklärung ersetzen (z. B. per Generator + anwaltlicher Prüfung).</p>
+      <h3>Verantwortlicher</h3>
+      <p>{site.owner}, {site.address.street}, {site.address.zip} {site.address.city}. E-Mail: {site.email}</p>
+      <h3>Kontaktformular</h3>
+      <p>Wenn du uns per Formular oder E-Mail kontaktierst, werden deine Angaben zur Bearbeitung der Anfrage gespeichert. Es erfolgt keine Weitergabe an Dritte ohne deine Einwilligung.</p>
+      <h3>Hosting & Server-Logs</h3>
+      <p>[TODO: Hoster nennen, Server-Logfiles beschreiben]</p>
+      <h3>Deine Rechte</h3>
+      <p>Auskunft, Berichtigung, Löschung, Einschränkung, Widerspruch und Datenübertragbarkeit gemäß DSGVO.</p>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .legal { max-width: 70ch; }
+  .legal h3 { margin-top: 1.8rem; }
+  .legal p { color: var(--muted); }
+</style>

@@ -1,0 +1,53 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import SectionHeader from "@components/SectionHeader.astro";
+import Icon from "@components/Icon.astro";
+import { site } from "@data/site";
+
+const values = [
+  { t: "Präzision", d: "Sauber konstruiert, maßhaltig gedruckt, sorgfältig nachbearbeitet." },
+  { t: "Beratung", d: "Ehrliche Einschätzung zu Machbarkeit, Verfahren und Kosten." },
+  { t: "Regional", d: "Verwurzelt in Emden – kurze Wege, persönlicher Kontakt." },
+];
+---
+<BaseLayout title="Über uns – Deichdrucker" description="Deichdrucker – 3D-Druck und Design aus Emden. Die Geschichte hinter der Werkstatt von Lukas Sikken.">
+  <section class="section">
+    <div class="container about">
+      <div class="about__text">
+        <SectionHeader no="00" label="Über uns" title="Hinter Deichdrucker" />
+        <p><strong>Deichdrucker</strong> ist 3D-Druck und Design aus {site.city} in {site.region} – gegründet und geführt von {site.owner}. Aus der Begeisterung für Technik, präzises Konstruieren und das Greifbarmachen von Ideen ist eine Werkstatt entstanden, die vom Einzelstück bis zur Kleinserie fertigt.</p>
+        <p>Ob defektes Ersatzteil, eine Produktidee oder ein persönliches Geschenk: Ich begleite dein Vorhaben von der Skizze über CAD und 3D-Scan bis zum fertigen Druck – und berate dich ehrlich, welcher Weg zum besten Ergebnis führt.</p>
+        <p class="mono about__note">// Text-Platzhalter – hier kommt deine persönliche Story rein.</p>
+        <a href="/kontakt" class="btn btn--primary">Lass uns sprechen <Icon name="arrow" size={18} /></a>
+      </div>
+      <div class="about__media">
+        <div class="frame frame--tall"><span class="mono">// portrait_werkstatt.jpg</span></div>
+        <div class="about__loc">
+          <Icon name="pin" size={18} />
+          <span class="mono">{site.address.street}, {site.address.zip} {site.address.city}</span>
+        </div>
+      </div>
+    </div>
+
+    <div class="container">
+      <div class="grid grid--3" style="margin-top:3rem">
+        {values.map((v, i) => (
+          <div class="card">
+            <span class="card__index mono">0{i + 1}</span>
+            <h3>{v.t}</h3>
+            <p>{v.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .about { display: grid; grid-template-columns: 1.2fr 0.9fr; gap: 2.5rem; align-items: start; }
+  .about__note { color: var(--muted); font-size: 0.9rem; }
+  .about .btn { margin-top: 0.6rem; }
+  .about__loc { display: flex; align-items: center; gap: 0.5rem; margin-top: 1rem; color: var(--muted); font-size: 0.88rem; }
+  .about__loc :global(svg) { color: var(--accent); }
+  @media (max-width: 780px) { .about { grid-template-columns: 1fr; } }
+</style>

@@ -1,0 +1,59 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import SectionHeader from "@components/SectionHeader.astro";
+import Icon from "@components/Icon.astro";
+import { services } from "@data/services";
+---
+<BaseLayout title="Leistungen – Deichdrucker" description="FDM- und Harz-3D-Druck, CAD-Design und 3D-Scan aus Emden. Alle Leistungen von Deichdrucker im Überblick.">
+  <section class="section">
+    <div class="container">
+      <SectionHeader no="00" label="Leistungen" title="Was ich für dich fertige" intro="Vom ersten Entwurf bis zum fertigen Bauteil – alle Schritte aus einer Hand." />
+
+      <div class="stack" style="--stack-gap:1.4rem">
+        {services.map((s, i) => (
+          <article class="svc" id={s.id}>
+            <div class="svc__head">
+              <span class="svc__icon"><Icon name={s.icon} size={28} /></span>
+              <div>
+                <span class="section-no mono">{`0${i + 1}`}</span>
+                <h2>{s.title}</h2>
+              </div>
+            </div>
+            <div class="svc__grid">
+              <div>
+                <p>{s.description}</p>
+                <a href="/kontakt" class="btn btn--ghost">Dazu anfragen <Icon name="arrow" size={16} /></a>
+              </div>
+              <div class="svc__lists">
+                <div>
+                  <span class="label">Typische Anwendungen</span>
+                  <ul>{s.applications.map((a) => <li><Icon name="check" size={15} />{a}</li>)}</ul>
+                </div>
+                <div>
+                  <span class="label">Material / Format</span>
+                  <div class="taglist">{s.materials.map((m) => <span class="tag">{m}</span>)}</div>
+                </div>
+              </div>
+            </div>
+          </article>
+        ))}
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  .svc { border: 1px solid var(--line); border-radius: var(--radius); padding: clamp(1.4rem, 4vw, 2.2rem); background: var(--surface); margin-bottom: 1.4rem; }
+  .svc__head { display: flex; align-items: center; gap: 1rem; margin-bottom: 1.4rem; }
+  .svc__head h2 { margin: 0.2rem 0 0; font-size: clamp(1.5rem, 3vw, 2rem); }
+  .svc__icon { display: grid; place-items: center; width: 60px; height: 60px; border: 1px solid var(--line); border-radius: 12px; color: var(--accent); flex-shrink: 0; }
+  .svc__grid { display: grid; grid-template-columns: 1.2fr 1fr; gap: 2rem; }
+  .svc__lists { display: grid; gap: 1.3rem; }
+  .svc__lists .label { display: block; margin-bottom: 0.6rem; }
+  ul { list-style: none; padding: 0; margin: 0; display: grid; gap: 0.5rem; }
+  li { display: flex; align-items: center; gap: 0.55rem; color: var(--muted); font-size: 0.96rem; }
+  li :global(svg) { color: var(--accent); flex-shrink: 0; }
+  .taglist { display: flex; flex-wrap: wrap; gap: 0.4rem; }
+  .btn { margin-top: 1rem; }
+  @media (max-width: 760px) { .svc__grid { grid-template-columns: 1fr; gap: 1.4rem; } }
+</style>

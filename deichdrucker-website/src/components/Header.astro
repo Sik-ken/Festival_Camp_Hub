@@ -1,0 +1,80 @@
+---
+import { nav, site } from "@data/site";
+import Icon from "./Icon.astro";
+const path = Astro.url.pathname;
+const isActive = (href: string) => path === href || (href !== "/" && path.startsWith(href));
+---
+<header class="hd">
+  <div class="container hd__inner">
+    <a href="/" class="hd__brand" aria-label={`${site.name} – Startseite`}>
+      <span class="hd__mark" aria-hidden="true">
+        <svg width="26" height="26" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.7" stroke-linejoin="round">
+          <path d="M4 20h16" /><path d="M6 20V9l6-4 6 4v11" /><path d="M10 20v-5h4v5" />
+        </svg>
+      </span>
+      <span class="hd__name">Deich<span class="hd__accent">drucker</span></span>
+    </a>
+
+    <nav class="hd__nav" aria-label="Hauptnavigation">
+      {nav.map((item) => (
+        <a href={item.href} class:list={["hd__link", { "is-active": isActive(item.href) }]}>{item.label}</a>
+      ))}
+    </nav>
+
+    <a href="/kontakt" class="btn btn--primary hd__cta">Projekt anfragen</a>
+
+    <button class="hd__burger" aria-label="Menü öffnen" aria-expanded="false" data-menu-toggle>
+      <Icon name="menu" size={24} />
+    </button>
+  </div>
+
+  <div class="hd__mobile" data-mobile-menu hidden>
+    <nav aria-label="Mobile Navigation">
+      {nav.map((item) => (
+        <a href={item.href} class:list={["hd__mlink", { "is-active": isActive(item.href) }]}>{item.label}</a>
+      ))}
+      <a href="/kontakt" class="btn btn--primary" style="margin-top:0.5rem">Projekt anfragen</a>
+    </nav>
+  </div>
+</header>
+
+<style>
+  .hd {
+    position: sticky; top: 0; z-index: 50;
+    background: color-mix(in srgb, var(--bg) 82%, transparent);
+    backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--line);
+  }
+  .hd__inner { display: flex; align-items: center; gap: 1.5rem; height: 68px; }
+  .hd__brand { display: flex; align-items: center; gap: 0.6rem; font-weight: 700; font-size: 1.2rem; letter-spacing: -0.02em; }
+  .hd__mark { color: var(--accent); display: grid; place-items: center; }
+  .hd__accent { color: var(--accent); }
+  .hd__nav { display: flex; gap: 0.4rem; margin-left: auto; }
+  .hd__link {
+    font-size: 0.96rem; color: var(--muted); padding: 0.5rem 0.8rem; border-radius: 8px;
+    transition: color 0.15s ease, background 0.15s ease;
+  }
+  .hd__link:hover { color: var(--text); background: var(--surface); }
+  .hd__link.is-active { color: var(--text); }
+  .hd__cta { margin-left: 0.4rem; }
+  .hd__burger { display: none; background: none; border: 1px solid var(--line); color: var(--text); border-radius: 8px; padding: 0.4rem; cursor: pointer; }
+  .hd__mobile { border-bottom: 1px solid var(--line); background: var(--surface); }
+  .hd__mobile nav { display: flex; flex-direction: column; padding: 1rem var(--gutter); gap: 0.2rem; }
+  .hd__mlink { padding: 0.7rem 0.4rem; color: var(--muted); border-bottom: 1px solid var(--line-soft); }
+  .hd__mlink.is-active { color: var(--text); }
+
+  @media (max-width: 860px) {
+    .hd__nav, .hd__cta { display: none; }
+    .hd__burger { display: grid; place-items: center; margin-left: auto; }
+  }
+</style>
+
+<script>
+  const toggle = document.querySelector("[data-menu-toggle]");
+  const menu = document.querySelector("[data-mobile-menu]");
+  toggle?.addEventListener("click", () => {
+    const open = menu?.hasAttribute("hidden");
+    if (open) { menu?.removeAttribute("hidden"); toggle?.setAttribute("aria-expanded", "true"); }
+    else { menu?.setAttribute("hidden", ""); toggle?.setAttribute("aria-expanded", "false"); }
+  });
+</script>

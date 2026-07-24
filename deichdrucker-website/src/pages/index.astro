@@ -1,0 +1,205 @@
+---
+import BaseLayout from "@layouts/BaseLayout.astro";
+import SectionHeader from "@components/SectionHeader.astro";
+import Icon from "@components/Icon.astro";
+import { services } from "@data/services";
+import { projects } from "@data/projects";
+import { products } from "@data/products";
+import { site } from "@data/site";
+
+const steps = [
+  { no: "01", title: "Idee & Anfrage", text: "Du schilderst dein Vorhaben – ob Skizze, Foto oder fertige Datei." },
+  { no: "02", title: "CAD / 3D-Scan", text: "Ich konstruiere oder scanne, bis das Modell maßhaltig und druckfertig ist." },
+  { no: "03", title: "3D-Druck", text: "FDM oder Harz – ich wähle Verfahren und Material passend zum Ziel." },
+  { no: "04", title: "Fertig & Übergabe", text: "Nachbearbeitung, Qualitätscheck und Übergabe – lokal oder per Versand." },
+];
+const featured = projects.slice(0, 3);
+---
+<BaseLayout>
+  <!-- HERO -->
+  <section class="hero">
+    <div class="container hero__inner">
+      <div class="eyebrow-row">
+        <span class="label">// {site.tagline}</span>
+      </div>
+      <h1 class="hero__title">
+        Von der Idee zum<br /><span class="hero__hl">fertigen Objekt.</span>
+      </h1>
+      <p class="hero__sub">
+        Deichdrucker fertigt präzise 3D-Drucke, konstruiert in CAD und digitalisiert reale Objekte per 3D-Scan – handgemacht in {site.city}, {site.region}.
+      </p>
+      <div class="hero__actions">
+        <a href="/kontakt" class="btn btn--primary btn--lg">Projekt anfragen <Icon name="arrow" size={18} /></a>
+        <a href="/leistungen" class="btn btn--ghost btn--lg">Leistungen ansehen</a>
+      </div>
+      <div class="hero__meta mono">
+        <span><Icon name="pin" size={15} /> {site.address.city}</span>
+        <span>FDM · SLA · CAD · SCAN</span>
+        <span>Einzelstück bis Kleinserie</span>
+      </div>
+    </div>
+    <div class="hero__glow" aria-hidden="true"></div>
+  </section>
+
+  <!-- LEISTUNGEN -->
+  <section class="section" id="leistungen">
+    <div class="container">
+      <SectionHeader no="01" label="Leistungen" title="Was Deichdrucker für dich baut" intro="Vier Kompetenzen, ein Ziel: dein Objekt sauber, maßhaltig und stabil in die Realität bringen." />
+      <div class="grid grid--4">
+        {services.map((s) => (
+          <a href="/leistungen" class="card">
+            <span class="card__corner card__corner--tl"></span>
+            <span class="card__corner card__corner--br"></span>
+            <span class="card__icon"><Icon name={s.icon} size={24} /></span>
+            <h3>{s.title}</h3>
+            <p>{s.short}</p>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- ABLAUF -->
+  <section class="section section--tight" style="background:var(--surface); border-block:1px solid var(--line);">
+    <div class="container">
+      <SectionHeader no="02" label="Ablauf" title="So läuft dein Auftrag" intro="Klar, transparent und ohne Umwege – vier Schritte von der Anfrage bis zum fertigen Teil." />
+      <div class="grid grid--4">
+        {steps.map((st) => (
+          <div class="step">
+            <span class="step__no mono">{st.no}</span>
+            <h3>{st.title}</h3>
+            <p>{st.text}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PROJEKTE TEASER -->
+  <section class="section">
+    <div class="container">
+      <div class="teaser-head">
+        <SectionHeader no="03" label="Projekte" title="Ausgewählte Arbeiten" />
+        <a href="/projekte" class="btn btn--ghost">Alle Projekte <Icon name="arrow" size={16} /></a>
+      </div>
+      <div class="grid grid--3">
+        {featured.map((p) => (
+          <a href="/projekte" class="card card--proj">
+            <div class="frame">
+              <span class="mono">// {p.id}.jpg</span>
+            </div>
+            <h3>{p.title}</h3>
+            <p>{p.description}</p>
+            <div class="taglist">{p.tags.map((t) => <span class="tag">{t}</span>)}</div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- PRODUKTE TEASER -->
+  <section class="section section--tight" style="background:var(--surface); border-block:1px solid var(--line);">
+    <div class="container">
+      <SectionHeader no="04" label="Produkte" title="Lampen aus Emden" intro="Licht mit lokalem Charakter und persönlicher Note – als Lithophane gefertigt." />
+      <div class="grid grid--2">
+        {products.map((p) => (
+          <a href="/lampen" class="card lamp">
+            <div class="frame frame--wide"><span class="mono">// {p.id}.jpg</span></div>
+            <div class="lamp__body">
+              <span class="label">{p.subtitle}</span>
+              <h3>{p.title}</h3>
+              <p>{p.description}</p>
+              <span class="lamp__price mono">ab {p.priceFrom} <Icon name="arrow" size={15} /></span>
+            </div>
+          </a>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- WARUM -->
+  <section class="section">
+    <div class="container">
+      <SectionHeader no="05" label="Warum Deichdrucker" title="Präzision, die man sieht" />
+      <div class="grid grid--3">
+        {[
+          { t: "Lokal in Emden", d: "Persönliche Beratung und kurze Wege – direkt aus Ostfriesland." },
+          { t: "Maßhaltig & sauber", d: "Sorgfältige CAD-Arbeit und Nachbearbeitung für ein fertiges Ergebnis." },
+          { t: "Von Idee bis Serie", d: "Einzelstück, Prototyp oder Kleinserie – flexibel und ehrlich kalkuliert." },
+        ].map((f, i) => (
+          <div class="card">
+            <span class="card__index mono">0{i + 1}</span>
+            <span class="card__icon"><Icon name="check" size={22} /></span>
+            <h3>{f.t}</h3>
+            <p>{f.d}</p>
+          </div>
+        ))}
+      </div>
+    </div>
+  </section>
+
+  <!-- CTA BAND -->
+  <section class="section">
+    <div class="container">
+      <div class="cta">
+        <span class="cta__corner card__corner card__corner--tl"></span>
+        <span class="cta__corner card__corner card__corner--tr"></span>
+        <span class="cta__corner card__corner card__corner--bl"></span>
+        <span class="cta__corner card__corner card__corner--br"></span>
+        <span class="label">// bereit wenn du es bist</span>
+        <h2>Hast du eine Idee? Lass sie uns drucken.</h2>
+        <p>Schick mir deine Skizze, dein Foto oder deine Datei – ich melde mich mit einer ehrlichen Einschätzung.</p>
+        <a href="/kontakt" class="btn btn--primary btn--lg">Jetzt anfragen <Icon name="arrow" size={18} /></a>
+      </div>
+    </div>
+  </section>
+</BaseLayout>
+
+<style>
+  /* HERO */
+  .hero { position: relative; padding-block: clamp(4rem, 12vw, 8rem); overflow: hidden; }
+  .hero__inner { position: relative; z-index: 1; max-width: 780px; }
+  .hero__title { font-size: clamp(2.6rem, 8vw, 5rem); }
+  .hero__hl { color: var(--accent); }
+  .hero__sub { font-size: clamp(1.05rem, 2.5vw, 1.3rem); max-width: 56ch; color: var(--muted); }
+  .hero__actions { display: flex; gap: 0.8rem; flex-wrap: wrap; margin-top: 2rem; }
+  .hero__meta { display: flex; gap: 1.4rem; flex-wrap: wrap; margin-top: 2.4rem; color: var(--muted); font-size: 0.85rem; }
+  .hero__meta span { display: inline-flex; align-items: center; gap: 0.4rem; }
+  .hero__glow {
+    position: absolute; top: -20%; right: -10%; width: 60vw; height: 60vw; max-width: 720px; max-height: 720px;
+    background: radial-gradient(circle, rgba(56,189,248,0.14), transparent 62%); pointer-events: none; z-index: 0;
+  }
+
+  /* Steps */
+  .step { padding: 1.2rem 0.2rem; border-top: 1px solid var(--line); }
+  .step__no { color: var(--accent); font-size: 1.4rem; display: block; margin-bottom: 0.6rem; }
+  .step h3 { font-size: 1.15rem; }
+  .step p { font-size: 0.95rem; }
+
+  /* Teaser head */
+  .teaser-head { display: flex; align-items: flex-end; justify-content: space-between; gap: 1rem; flex-wrap: wrap; }
+  .teaser-head :global(.sh) { margin-bottom: 1.5rem; }
+
+  .card--proj .frame { margin-bottom: 1.1rem; }
+  .taglist { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.9rem; }
+
+  /* Lamp cards */
+  .lamp { padding: 0; overflow: hidden; }
+  .lamp .frame { border: 0; border-bottom: 1px solid var(--line); border-radius: 0; }
+  .lamp__body { padding: 1.5rem; }
+  .lamp__body .label { display: block; margin-bottom: 0.3rem; }
+  .lamp__price { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--signal); margin-top: 0.6rem; font-size: 0.9rem; }
+
+  /* CTA */
+  .cta {
+    position: relative; text-align: center; padding: clamp(2.5rem, 6vw, 4.5rem);
+    background:
+      radial-gradient(ellipse at top, rgba(56,189,248,0.08), transparent 70%),
+      var(--surface);
+    border: 1px solid var(--line); border-radius: var(--radius);
+  }
+  .cta h2 { margin-top: 0.6rem; }
+  .cta p { max-width: 46ch; margin-inline: auto; }
+  .cta .btn { margin-top: 1.2rem; }
+  .cta__corner { width: 14px; height: 14px; opacity: 0.8; }
+</style>

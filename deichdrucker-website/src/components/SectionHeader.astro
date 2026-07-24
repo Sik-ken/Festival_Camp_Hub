@@ -1,0 +1,25 @@
+---
+interface Props {
+  no?: string;
+  label?: string;
+  title: string;
+  intro?: string;
+  center?: boolean;
+}
+const { no, label, title, intro, center = false } = Astro.props;
+---
+<div class:list={["sh", { "sh--center": center }]}>
+  <div class="eyebrow-row" style={center ? "justify-content:center" : ""}>
+    {no && <span class="section-no">{no}</span>}
+    {label && <span class="label">{label}</span>}
+  </div>
+  <h2>{title}</h2>
+  {intro && <p class="sh__intro">{intro}</p>}
+</div>
+
+<style>
+  .sh { margin-bottom: 2.5rem; }
+  .sh--center { text-align: center; }
+  .sh__intro { max-width: 60ch; font-size: 1.05rem; }
+  .sh--center .sh__intro { margin-inline: auto; }
+</style>
